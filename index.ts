@@ -15,15 +15,14 @@ console.log(supabase);
 const app = express();
 const port = process.env.PORT || 3000;
 
-//function to fetch data, should work once updated. error shows its looking for data
-//Should update though to use server side, I think this is using client side. 
 
-async function fetchData(projectID) {
+async function fetchData(projectId) {
     try {
         const { data, error } = await supabase
-            .from('projects') // Replace 'projects'  table name
-            .select('*')
-            .eq('id', projectID);
+            .from('projects') 
+            .select('projectTitle') 
+            .eq('projectId', projectId)     
+            .single();                   
 
         if (error) {
             console.error('Error fetching data:', error);
@@ -38,17 +37,23 @@ async function fetchData(projectID) {
     }
 }
 
+
+
 app.get('/:projectID', async (req, res) => {
     const projectID = req.params.projectID;
 
-    const { data, error } = await fetchData(projectID);
+    const { data, error } = await fetchData(projectID); 
 
     if (error) {
-        res.status(500).send(`Error fetching project data: ${error.message}`);
+        res.status(500).send(`<h1>Error fetching project data: ${error.message}</h1>`);
     } else {
-        res.send(`<b>Project ID:</b> ${projectID}<br><b>Data:</b> ${JSON.stringify(data)}`);
+        res.send(`
+            <h1>Project Title: ${data.projectTitle}</h1>
+            <p>Project ID: ${projectID}</p>
+        `);
     }
 });
+
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
