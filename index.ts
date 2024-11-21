@@ -1,37 +1,55 @@
-//import { createClient } from '@supabase/supabase-ts';
+const express = require('express');
+const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
 
-const supabaseUrl = "https://ryahobupnpaxmebdbkae.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5YWhvYnVwbnBheG1lYmRia2FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA1ODM4MDYsImV4cCI6MjA0NjE1OTgwNn0.fv5vDtFAaHgmXEc-OIeW74tUfqqhXEdCSYGM-fp2wsw";
-//const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 
-const express = require('express')
-const app = express()
-const port = 3000
+if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Missing Supabase configuration: SUPABASE_URL or SUPABASE_KEY');
+}
 
-app.get('/:projectID', (req, res) => {
+const supabase = createClient(supabaseUrl, supabaseKey);
+console.log(supabase);
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+//function to fetch data, should work once updated. error shows its looking for data
+//Should update though to use server side, I think this is using client side. 
+
+async function fetchData(projectID) {
+    try {
+        const { data, error } = await supabase
+            .from('projects') // Replace 'projects'  table name
+            .select('*')
+            .eq('id', projectID);
+
+        if (error) {
+            console.error('Error fetching data:', error);
+            return { error };
+        }
+
+        console.log('Data fetched:', data);
+        return { data };
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        return { error };
+    }
+}
+
+app.get('/:projectID', async (req, res) => {
     const projectID = req.params.projectID;
-    res.send('<b>' + projectID +'</b>');
-})
+
+    const { data, error } = await fetchData(projectID);
+
+    if (error) {
+        res.status(500).send(`Error fetching project data: ${error.message}`);
+    } else {
+        res.send(`<b>Project ID:</b> ${projectID}<br><b>Data:</b> ${JSON.stringify(data)}`);
+    }
+});
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-  })
-
-/*async function fetchData(projectID) {
-    try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select(QUERY FOR PROJECTID FROM TABLE);
-  
-      if (error) {
-        console.error('Error fetching data:', error);
-      } else {
-        console.log('Data fetched:', data);
-      }
-    } catch (error) {
-      console.error('Unexpected error:', error);
-    }
-  }
-  
-  fetchData();
-  */
+    console.log(`Server running at http://localhost:${port}`);
+});
