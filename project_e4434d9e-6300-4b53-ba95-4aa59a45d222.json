@@ -1,0 +1,31 @@
+{
+  "projectId": "e4434d9e-6300-4b53-ba95-4aa59a45d222",
+  "userId": "6b9e3b7b-3b1b-4b3b-8b7b-9e3b1b4b3b8b",
+  "projectTitle": "Mock Project Title",
+  "projectDescription": "This is a mock project description.",
+  "projectDomain": "Automotive",
+  "projectKeywords": [
+    "mock",
+    "project",
+    "data"
+  ],
+  "projectConfigurationDetails": "Additional details about the project.",
+  "projectThumbnail": "/img/christmas-all.jpeg",
+  "projectUrl": null,
+  "projectStatus": "DRAFT",
+  "projectServiceAreas": null,
+  "projectSeoTitle": null,
+  "projectSeoDescription": null,
+  "projectSeoKeywords": null,
+  "projectSeoImage": null,
+  "projectLanguage": null,
+  "projectRegion": null,
+  "projectPrimaryColor": null,
+  "projectFontFamily": null,
+  "projectRepositoryUrl": null,
+  "projectDeploymentUrl": null,
+  "lastUpdated": "2024-11-22T01:10:37.717",
+  "createdAt": "2024-11-22T01:10:37.717",
+  "affiliateClientOwnerId": null,
+  "affiliateOwnerId": null
+}
