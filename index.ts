@@ -1,5 +1,6 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
+const { format } = require('date-fns')
 require('dotenv').config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -20,7 +21,7 @@ async function fetchData(projectId) {
     try {
         const { data, error } = await supabase
             .from('projects') 
-            .select('projectTitle') 
+            .select() 
             .eq('projectId', projectId)     
             .single();                   
 
@@ -38,6 +39,7 @@ async function fetchData(projectId) {
 }
 
 
+app.use(express.static('public'));
 
 app.get('/:projectID', async (req, res) => {
     const projectID = req.params.projectID;
@@ -50,9 +52,17 @@ app.get('/:projectID', async (req, res) => {
         res.send(`
             <h1>Project Title: ${data.projectTitle}</h1>
             <p>Project ID: ${projectID}</p>
+            <h2>This Project was created at ${format(data.createdAt, 'HH:mm MM/dd/yyyy')}</h2>
+            <img src="${data.projectThumbnail}" alt = "Project Thumbnail"></img>
+            <p>${data.projectThumbnail}</p>
+            <img src="blob:https://enjerneering-ui-builder.vercel.app/fbda0354-ac76-441e-8bd5-a20a3a4454e5"></img>
+            <iframe src = ${data.projectThumbnail}></iframe>
         `);
     }
+
 });
+
+//format(data.createdAt, 'dd/MM/yyyy HH:mm')
 
 
 app.listen(port, () => {
