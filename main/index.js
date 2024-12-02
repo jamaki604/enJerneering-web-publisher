@@ -1,10 +1,10 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const { format } = require('date-fns');
-const TextBoxStyle = require('./public/componentHTML/style/textBoxStyle');
-const TextBoxContent = require('./public/componentHTML/content/textBoxContent');
-const FooterStyle = require('./public/componentHTML/style/footerStyle');
-const FooterContent = require('./public/componentHTML/content/footerContent');
+const TextBoxStyle = require('../public/componentHTML/style/textBoxStyle');
+const TextBoxContent = require('../public/componentHTML/content/textBoxContent');
+const FooterStyle = require('../public/componentHTML/style/footerStyle');
+const FooterContent = require('../public/componentHTML/content/footerContent');
 require('dotenv').config();
 
 console.log("STARTING INDEX.ts")
@@ -47,9 +47,20 @@ const renderRow = (label, value) => {
     return `<tr><th>${label}</th><td>${value}</td></tr>`;
 };
 
-const redirectToViewer = (projectID, window) => {
-    window.location.href = (`localhost:4000/viewer/${projectID}`);
-};
+const renderServices = (serviceData) => {
+    let services = '';
+    for (let index = 0; index < serviceData.length; index++) {
+        services += `
+        <h3>Service ${index + 1}</h3>
+            <table>
+                <tr><th>ID</th><td>${serviceData[index].serviceId}</td><tr>
+                <tr><th>Name</th><td>${serviceData[index].serviceName}</td><tr>
+                <tr><th>Description</th><td>${serviceData[index].serviceDescription}</td><tr>
+            </table>
+        `
+    }
+    return services
+}
 
 // Fetch data from Supabase
 async function fetchData(projectId) {
@@ -86,6 +97,19 @@ async function fetchData(projectId) {
             console.warn(`No textbox data found for Project ID: ${projectId}`);
         }
 
+        const { data: serviceData, error: serviceError } = await supabase
+            .from('services')
+            .select()
+            .eq('projectId', projectId);
+
+        console.log('Data:', serviceData);
+        console.log('idk man this is dumb', serviceData.find(service => service.projectId === projectId))
+
+        if (serviceError) {
+            console.warn(`No Service data found for Project ID: ${projectId}`);
+        }
+
+        /// parse data from textbox and footer below
         let parsedTextboxData = null;
         if (elementData && elementData.length > 0 && elementData[0].textBoxData) {
             try {
@@ -104,8 +128,14 @@ async function fetchData(projectId) {
                 console.error('Failed to parse textBoxData:', parseError.message);
             }
         }
+
+        let servicesFromProject = null;
+        if (serviceData && serviceData.length > 0 && serviceData) {
+            servicesFromProject = serviceData.filter((service) => service.projectId === projectId);
+        }
         return {
             projectData,
+            serviceData: servicesFromProject,
             textboxData: parsedTextboxData,
             footerData: parsedFooterData,
         };
@@ -116,23 +146,23 @@ async function fetchData(projectId) {
 }
 
 // Dynamic route for project display
-app.get('/:projectID', async (req, res) => {
-    const projectID = req.params.projectID;
+app.get('/:projectId', async (req, res) => {
+    const projectId = req.params.projectId;
 
-    console.log(`Received request for projectID: ${projectID}`);
+    console.log(`Received request for projectID: ${projectId}`);
 
-    if (!projectID || projectID === 'null') {
+    if (!projectId || projectId === 'null') {
         res.status(400).send('<h1>Invalid Project Request</h1>');
         return;
     }
 
-    const fetchResult = await fetchData(projectID);
+    const fetchResult = await fetchData(projectId);
 
     if (fetchResult.error) {
         console.error(fetchResult.error);
         res.status(404).send(`<h1>Error: ${fetchResult.error.message}</h1>`);
     } else {
-        const { projectData, textboxData } = fetchResult;
+        const { projectData, serviceData } = fetchResult;
 
         const createdAt = new Date(projectData.createdAt);
         const lastUpdated = new Date(projectData.lastUpdated);
@@ -198,25 +228,17 @@ app.get('/:projectID', async (req, res) => {
                     ${renderRow('Repository URL', projectData.projectRepositoryUrl)}
                     ${renderRow('Deployment URL', projectData.projectDeploymentUrl)}
                 </table>
-
-                <h2>SEO and Other Information</h2>
-                <table>
-                    ${renderRow('SEO Title', projectData.projectSeoTitle)}
-                    ${renderRow('SEO Description', projectData.projectSeoDescription)}
-                    ${renderRow('SEO Keywords', projectData.projectSeoKeywords)}
-                </table>
-
+                
+                ${serviceData ? `
+                    <h2>Services</h2>
+                        ${renderServices(serviceData)}
+                    `:'<h2>Project has No Inputted Services</h2>'
+                }    
+                
                 ${projectData.projectThumbnail ? `
-                <h2>Thumbnail</h2>
+                <h2>Project Thumbnail</h2>
                 <img src="${projectData.projectThumbnail}" alt="Project Thumbnail">
                 ` : ''}
-
-                ${textboxData ? `
-                <h2>Textbox Content</h2>
-                <p>${textboxData.content}</p>
-                ` : `
-                <h2>No Textbox Data Available</h2>
-                `}
             </body>
             <body>
             <h1>Redirect to Viewer</h1>
@@ -224,7 +246,7 @@ app.get('/:projectID', async (req, res) => {
         </body>
         <script>
             function redirectToViewer() {
-                window.location.href = 'http://localhost:4000/viewer/${projectID}';
+                window.location.href = 'http://localhost:4000/viewer/${projectId}';
             }
         </script>
             </html>
@@ -237,17 +259,17 @@ app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
 //// Adding 2nd Page (MAYBE) - PIERSON SILVer
-app.get('/viewer/:projectID', async (req, res) => {
-    const projectID = req.params.projectID;
+app.get('/viewer/:projectId', async (req, res) => {
+    const projectId = req.params.projectId;
 
-    console.log(`Received request for projectID: ${projectID}`);
+    console.log(`Received request for projectID: ${projectId}`);
 
-    if (!projectID || projectID === 'null') {
+    if (!projectId || projectId === 'null') {
         res.status(400).send('<h1>Invalid Project Request</h1>');
         return;
     }
 
-    const fetchResult = await fetchData(projectID);
+    const fetchResult = await fetchData(projectId);
 
     if (fetchResult.error) {
         console.error(fetchResult.error);
@@ -257,9 +279,6 @@ app.get('/viewer/:projectID', async (req, res) => {
 
         textBoxContent = new TextBoxContent(textboxData);
         footerContent = new FooterContent(footerData);
-
-        const createdAt = new Date(projectData.createdAt);
-        const lastUpdated = new Date(projectData.lastUpdated);
     
         res.send(`
             <html>
@@ -287,7 +306,7 @@ app.get('/viewer/:projectID', async (req, res) => {
                 </body>
                 <script>
                 function redirectToDetails() {
-                    window.location.href = 'http://localhost:4000/${projectID}';
+                    window.location.href = 'http://localhost:4000/${projectId}';
                 }
                 </script>
     
