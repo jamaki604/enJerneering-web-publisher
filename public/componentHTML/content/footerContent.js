@@ -10,7 +10,7 @@ class FooterContent{
                             <h2 id="footer-heading" class="sr-only">Footer</h2>
                             <div class="footer-content">
                                 <div class="footer-logo">
-                                    <img src="${this.parsedFooterData.logo} we gotta figure this img thing out for the logo" alt="Logo"/>
+                                    <img src="${this.parsedFooterData.logo}" alt="Logo"/>
                                     <p class="footer-text">${this.parsedFooterData.slogan}</p>
                                     <h3>Socials</h3>
                                         <ul role="list" class="horizontal-list">
