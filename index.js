@@ -260,34 +260,38 @@ app.get('/viewer/:projectID', async (req, res) => {
 
         const createdAt = new Date(projectData.createdAt);
         const lastUpdated = new Date(projectData.lastUpdated);
-    }
-
-    res.send(`
-        <html>
-            <style>
-            .idk {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 1.5rem; /* space-y-6 */
+    
+        res.send(`
+            <html>
+                <style>
+                .idk {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 1.5rem; /* space-y-6 */
+                    }
+                ${textBoxStyle.getStyle()}
+                ${footerStyle.getStyle()}
+                </style>
+                <body class="idk">
+                ${textboxData ? `
+                    ${textBoxContent.getContent()}
+                    ` :''}
+                ${footerData ? `
+                    ${footerContent.getContent()}
+                    ` :''}
+                <body>
+                    <button onclick="redirectToDetails()">Return to Details</button>
+                </body>
+                </body>
+                <script>
+                function redirectToDetails() {
+                    window.location.href = 'http://localhost:4000/${projectID}';
                 }
-            ${textBoxStyle.getStyle()}
-            ${footerStyle.getStyle()}
-            </style>
-            <body class="idk">
-            ${textBoxContent.getContent()}
-            ${footerContent.getContent()}
-            <body>
-                <button onclick="redirectToDetails()">Return to Details</button>
-            </body>
-            </body>
-            <script>
-            function redirectToDetails() {
-                window.location.href = 'http://localhost:4000/${projectID}';
-            }
-            </script>
-
-        </html>
-        `)
+                </script>
+    
+            </html>
+            `)
+    }
 });
