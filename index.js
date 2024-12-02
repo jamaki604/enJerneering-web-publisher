@@ -169,7 +169,7 @@ app.get('/:projectID', async (req, res) => {
                         font-weight: bold;
                     }
                     img {
-                        max-width: 100%;
+                        max-width: 20%;
                         height: auto;
                         display: block;
                         margin: 20px 0;
