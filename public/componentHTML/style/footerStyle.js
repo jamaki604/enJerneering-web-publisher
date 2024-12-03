@@ -4,6 +4,7 @@ class FooterStyle{
                 .footer-container {
                     z-index: 30;
                     background-color: #DCD3FF; /* Equivalent to bg-gray-50 */
+                    max-width: 60%;
                 }
 
                 .footer {
