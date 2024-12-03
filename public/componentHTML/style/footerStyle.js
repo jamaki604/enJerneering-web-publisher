@@ -31,11 +31,6 @@ class FooterStyle{
                     max-width: 400px; /* xl:max-w-[400px] */
                 }
 
-                .footer-logo img {
-                    width: 230px;
-                    height: 48px;
-                }
-
                 .footer-text {
                     font-size: 1rem; /* text-base */
                     font-weight: 400; /* font-normal */

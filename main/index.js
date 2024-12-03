@@ -275,7 +275,7 @@ app.get('/viewer/:projectId', async (req, res) => {
         console.error(fetchResult.error);
         res.status(404).send(`<h1>Error: ${fetchResult.error.message}</h1>`);
     } else {
-        const { projectData, textboxData, footerData } = fetchResult;
+        const { textboxData, footerData } = fetchResult;
 
         textBoxContent = new TextBoxContent(textboxData);
         footerContent = new FooterContent(footerData);
@@ -301,7 +301,7 @@ app.get('/viewer/:projectId', async (req, res) => {
                     ${footerContent.getContent()}
                     ` :''}
                 <body>
-                    <button onclick="redirectToDetails()">Return to Details</button>
+                    <button onclick="redirectToDetails()">View Details</button>
                 </body>
                 </body>
                 <script>
