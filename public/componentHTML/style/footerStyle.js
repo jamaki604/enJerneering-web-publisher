@@ -28,7 +28,8 @@ class FooterStyle{
                     flex-direction: column;
                     gap: 1.5rem; /* space-y-6 */
                     flex-shrink: 0;
-                    max-width: 400px; /* xl:max-w-[400px] */
+                    max-width: 20%;
+                    height: auto;
                 }
 
                 .footer-text {

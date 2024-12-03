@@ -7,7 +7,6 @@ class FooterContent{
                 <body>
                     <div class="footer-container">
                         <footer aria-labelledby="footer-heading" class="footer">
-                            <h2 id="footer-heading" class="sr-only">Footer</h2>
                             <div class="footer-content">
                                 <div class="footer-logo">
                                     <img src="${this.parsedFooterData.logo}" alt="Logo"/>
