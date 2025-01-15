@@ -75,7 +75,7 @@ async function fetchData(projectId) {
         let elementData = await fetchElementData(projectId);
         let textboxData = getTextBoxData(elementData);
         let footerData = getFooterData(elementData);
-        let serviceData = await fetchServiceData(projectId)
+        let serviceData = await getServiceData(projectId)
 
         return {
             projectData,
@@ -88,6 +88,8 @@ async function fetchData(projectId) {
         return { error };
     }
 }
+
+// Refactored Helper Functions Start -- Pierson Silver
 
 async function fetchProjectData(projectId) {
     // Fetch project data
@@ -142,7 +144,11 @@ async function fetchServiceData(projectId) {
     if (serviceError) {
         console.warn(`No Service data found for Project ID: ${projectId}`);
     }
+    return serviceData;
+}
 
+const getServiceData = async (projectId) => {
+    let serviceData = await fetchServiceData(projectId)
     let servicesFromProject = null;
     if (serviceData && serviceData.length > 0 && serviceData) {
         servicesFromProject = serviceData.filter((service) => service.projectId === projectId);
@@ -162,6 +168,8 @@ const parseData = (data, dataRequest) => {
     }
     return parsedData;
 }
+
+// Refactored Helper Functions End -- Pierson Silver
 
 // Dynamic route for project display
 app.get('/:projectId', async (req, res) => {
@@ -276,6 +284,8 @@ app.get('/:projectId', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
+
+
 //// Adding 2nd Page (MAYBE) - PIERSON SILVer
 app.get('/viewer/:projectId', async (req, res) => {
     const projectId = req.params.projectId;
