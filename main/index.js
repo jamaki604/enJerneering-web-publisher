@@ -147,14 +147,14 @@ async function fetchServiceData(projectId) {
     if (serviceData && serviceData.length > 0 && serviceData) {
         servicesFromProject = serviceData.filter((service) => service.projectId === projectId);
     }
-
+    return servicesFromProject;
 }
 
 const parseData = (data, dataRequest) => {
     let parsedData = null;
-    if (data && data.length > 0 && data[0].dataRequest) {
+    if (data && data.length > 0 && data[0][dataRequest]) {
         try {
-            parsedData = JSON.parse(data[0].dataRequest);
+            parsedData = JSON.parse(data[0][dataRequest]);
             console.log('parsed data:', parsedData)
         } catch (parseError) {
             console.error('Failed to parse data:', parseError.message);
