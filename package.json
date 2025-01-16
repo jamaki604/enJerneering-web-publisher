@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "viewer": "node ./main/index.js"
+    "viewer": "node ./main/index.js",
+    "test": "vitest"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.46.1",
@@ -21,6 +22,7 @@
     "tailwindcss": "^3.4.15",
     "typescript": "^5.6.3"
   },
+  
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.9.1",

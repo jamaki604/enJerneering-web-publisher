@@ -1,10 +1,14 @@
 {
-    "compilerOptions": {
-      "types": ["vitest/globals"],
-      "moduleResolution": "node",
-      "esModuleInterop": true,
-      "resolveJsonModule": true,
-      "strict": true
-    }
-  }
-  
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "CommonJS",
+    "allowJs": true,
+    "checkJs": true,
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  },
+  "include": ["main/**/*.js", "tests/**/*.ts"],
+  "exclude": ["node_modules"]
+}

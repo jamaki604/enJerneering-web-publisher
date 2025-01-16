@@ -62,18 +62,6 @@ const renderServices = (serviceData) => {
     }
     return services
 }
-
-
-module.exports = {
-    fetchData,
-    fetchProjectData,
-    fetchElementData,
-    fetchServiceData,
-    getTextBoxData,
-    getFooterData,
-    parseData,
-  };
-
   
 // Fetch data from Supabase
 async function fetchData(projectId) {
