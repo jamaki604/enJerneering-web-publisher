@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "types": ["vitest/globals"],
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "strict": true
+    }
+  }
+  

@@ -7,6 +7,7 @@ const FooterStyle = require('../public/componentHTML/style/footerStyle');
 const FooterContent = require('../public/componentHTML/content/footerContent');
 require('dotenv').config();
 
+
 console.log("STARTING INDEX.ts")
 
 /// Pierson Silver Adding Content and Style Class Initializers 
@@ -62,6 +63,18 @@ const renderServices = (serviceData) => {
     return services
 }
 
+
+module.exports = {
+    fetchData,
+    fetchProjectData,
+    fetchElementData,
+    fetchServiceData,
+    getTextBoxData,
+    getFooterData,
+    parseData,
+  };
+
+  
 // Fetch data from Supabase
 async function fetchData(projectId) {
     try {
