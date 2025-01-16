@@ -71,79 +71,105 @@ async function fetchData(projectId) {
 
         console.log(`Fetching data for projectId: ${projectId}`);
 
-        // Fetch project data
-        const { data: projectData, error: projectError } = await supabase
-            .from('projects')
-            .select()
-            .eq('projectId', projectId)
-            .single();
+        let projectData = await fetchProjectData(projectId);
+        let elementData = await fetchElementData(projectId);
+        let textboxData = getTextBoxData(elementData);
+        let footerData = getFooterData(elementData);
+        let serviceData = await getServiceData(projectId)
 
-        console.log('Project Data:', projectData);
-
-        if (projectError) {
-            throw new Error(`Project not found for Project ID: ${projectId}`);
-        }
-
-        // Fetch textbox data (optional)
-        const { data: elementData, error: elementError } = await supabase
-            .from('web-elements')
-            .select()
-            .eq('projectId', projectId)
-            .limit(1);
-
-        console.log('Data:', elementData);
-
-        if (elementError) {
-            console.warn(`No textbox data found for Project ID: ${projectId}`);
-        }
-
-        const { data: serviceData, error: serviceError } = await supabase
-            .from('services')
-            .select()
-            .eq('projectId', projectId);
-
-        console.log('Data:', serviceData);
-        console.log('idk man this is dumb', serviceData.find(service => service.projectId === projectId))
-
-        if (serviceError) {
-            console.warn(`No Service data found for Project ID: ${projectId}`);
-        }
-
-        /// parse data from textbox and footer below
-        let parsedTextboxData = null;
-        if (elementData && elementData.length > 0 && elementData[0].textBoxData) {
-            try {
-                parsedTextboxData = JSON.parse(elementData[0].textBoxData);
-                console.log('parsed data:', parsedTextboxData)
-            } catch (parseError) {
-                console.error('Failed to parse textBoxData:', parseError.message);
-            }
-        }
-        let parsedFooterData = null;
-        if (elementData && elementData.length > 0 && elementData[0].footerData) {
-            try {
-                parsedFooterData = JSON.parse(elementData[0].footerData);
-                console.log('parsed data:', parsedFooterData);
-            } catch (parseError) {
-                console.error('Failed to parse textBoxData:', parseError.message);
-            }
-        }
-
-        let servicesFromProject = null;
-        if (serviceData && serviceData.length > 0 && serviceData) {
-            servicesFromProject = serviceData.filter((service) => service.projectId === projectId);
-        }
         return {
             projectData,
-            serviceData: servicesFromProject,
-            textboxData: parsedTextboxData,
-            footerData: parsedFooterData,
+            serviceData,
+            textboxData,
+            footerData
         };
     } catch (error) {
         console.error(`[Fetch Data] Error for Project ID ${projectId}:`, error.message);
         return { error };
     }
 }
+
+// Refactored Helper Functions Start -- Pierson Silver
+
+async function fetchProjectData(projectId) {
+    // Fetch project data
+    const { data: projectData, error: projectError } = await supabase
+        .from('projects')
+        .select()
+        .eq('projectId', projectId)
+        .single();
+
+    console.log('Project Data:', projectData);
+
+    if (projectError) {
+        throw new Error(`Project not found for Project ID: ${projectId}`);
+    }
+    return projectData;
+}
+
+async function fetchElementData(projectId) {
+    // Fetch textbox data (optional)
+    const { data: elementData, error: elementError } = await supabase
+        .from('web-elements')
+        .select()
+        .eq('projectId', projectId)
+        .limit(1);
+
+    console.log('Data:', elementData);
+
+    if (elementError) {
+        console.warn(`No textbox data found for Project ID: ${projectId}`);
+    }
+    return elementData;
+}
+
+const getTextBoxData = (elementData) => {
+    let parsedTextBoxData = parseData(elementData, 'textBoxData')
+    return parsedTextBoxData;
+} 
+
+const getFooterData = (elementData) => {
+    let parsedFooterData = parseData(elementData, 'footerData')
+    return parsedFooterData;
+}
+
+async function fetchServiceData(projectId) {
+    const { data: serviceData, error: serviceError } = await supabase
+            .from('services')
+            .select()
+            .eq('projectId', projectId);
+
+    console.log('Data:', serviceData);
+
+    if (serviceError) {
+        console.warn(`No Service data found for Project ID: ${projectId}`);
+    }
+    return serviceData;
+}
+
+const getServiceData = async (projectId) => {
+    let serviceData = await fetchServiceData(projectId)
+    let servicesFromProject = null;
+    if (serviceData && serviceData.length > 0 && serviceData) {
+        servicesFromProject = serviceData.filter((service) => service.projectId === projectId);
+    }
+    return servicesFromProject;
+}
+
+const parseData = (data, dataRequest) => {
+    let parsedData = null;
+    if (data && data.length > 0 && data[0][dataRequest]) {
+        try {
+            parsedData = JSON.parse(data[0][dataRequest]);
+            console.log('parsed data:', parsedData)
+        } catch (parseError) {
+            console.error('Failed to parse data:', parseError.message);
+        }
+    }
+    return parsedData;
+}
+
+// Refactored Helper Functions End -- Pierson Silver
 
 // Dynamic route for project display
 app.get('/:projectId', async (req, res) => {
@@ -258,6 +284,8 @@ app.get('/:projectId', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
+
+
 //// Adding 2nd Page (MAYBE) - PIERSON SILVer
 app.get('/viewer/:projectId', async (req, res) => {
     const projectId = req.params.projectId;
