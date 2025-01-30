@@ -343,3 +343,14 @@ app.get('/viewer/:projectId', async (req, res) => {
             `)
     }
 });
+
+module.exports = {
+    fetchData,
+    fetchProjectData,
+    fetchElementData,
+    getTextBoxData,
+    getFooterData,
+    fetchServiceData,
+    getServiceData,
+    parseData,
+};
