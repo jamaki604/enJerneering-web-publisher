@@ -344,6 +344,12 @@ app.get('/viewer/:projectId', async (req, res) => {
     }
 });
 
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+    });
+}
+
 module.exports = {
     fetchData,
     fetchProjectData,
