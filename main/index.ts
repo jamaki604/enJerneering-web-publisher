@@ -74,7 +74,7 @@ async function fetchData(projectId: string) {
             .select("*")
             .eq("projectId", projectId);
 
-        let parsedTextboxData = null;
+        let parsedTextboxData: { content: string } | null = null;
         let parsedFooterData = null;
 
         if (elementData && elementData.length > 0) {
