@@ -232,25 +232,33 @@ app.get("/viewer/:projectId", async (req: Request, res: Response) => {
         textBoxContent = textboxData ? new TextBoxContent(textboxData) : null;
         footerContent = footerData ? new FooterContent(footerData) : null;
 
+        console.log("textboxData:", textboxData);
+        console.log("footerData:", footerData);
+        console.log("textBoxContent:", textBoxContent);
+        console.log("footerContent:", footerContent);
+
         res.send(`
             <!DOCTYPE html>
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Project Viewer</title>
-                <style>
-                    body { font-family: Arial, sans-serif; text-align: center; }
-                    .content { max-width: 800px; margin: 0 auto; padding: 20px; }
-                    .footer { margin-top: 40px; color: gray; font-size: 0.9rem; }
-                </style>
-            </head>
-            <body>
-                <div class="content">
-                    <h1>Project Viewer</h1>
-                    ${textboxData ? `<p>${textboxData.content}</p>` : "<p>No textbox data available</p>"}
-                    ${footerData ? `<div class="footer">${footerData.copyRight}</div>` : "<p>No footer data available</p>"}
-                </div>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Project Viewer</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; }
+                        .content { max-width: 800px; margin: 0 auto; padding: 20px; }
+                        .footer { margin-top: 40px; color: gray; font-size: 0.9rem; }
+                        /* Include missing styles */
+                        ${textBoxStyle.getStyle()}
+                        ${footerStyle.getStyle()}
+                    </style>
+                </head>
+                <body>
+                   <div class="content">
+            <h1>Project Viewer</h1>
+            ${textboxData ? `<p>${textboxData.content}</p>` : "<p>No textbox data available</p>"}
+            ${footerContent ? footerContent.getContent() : "<p>No footer data available</p>"}
+        </div>
                 <button onclick="redirectToDetails()">View Details</button>
                 <script>
                     function redirectToDetails() {
