@@ -1,122 +1,271 @@
-import express, { Request, Response, NextFunction } from 'express';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
+import express, { Request, Response, NextFunction } from "express";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
+import { format } from "date-fns";
+import path from "path";
+
+// Import styling and content components
+import TextBoxStyle from "../public/componentHTML/style/textBoxStyle";
+import TextBoxContent from "../public/componentHTML/content/textBoxContent";
+import FooterStyle from "../public/componentHTML/style/footerStyle";
+import FooterContent from "../public/componentHTML/content/footerContent";
 
 dotenv.config();
 
 const { SUPABASE_URL, SUPABASE_KEY } = process.env;
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
-    throw new Error('Missing Supabase configuration: SUPABASE_URL or SUPABASE_KEY');
+    throw new Error("Missing Supabase configuration: SUPABASE_URL or SUPABASE_KEY");
 }
 
 const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
-
 const app = express();
 const port = process.env.PORT ? parseInt(process.env.PORT) : 4000;
 
-app.use(express.static('public'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, "public")));
 
+// Initialize styling and content components
+let textBoxContent: TextBoxContent | null = null;
+const textBoxStyle = new TextBoxStyle();
+let footerContent: FooterContent | null = null;
+const footerStyle = new FooterStyle();
+
+// Middleware to log incoming requests
 app.use((req: Request, res: Response, next: NextFunction) => {
-    if (req.originalUrl === '/favicon.ico') {
-        res.status(204).end();
-        return;
-    }
+    console.log(`Received request: ${req.method} ${req.originalUrl}`);
     next();
 });
 
-const renderRow = (label: string, value?: string | null): string => {
-    if (!value) return '';
-    return `<tr><th>${label}</th><td>${value}</td></tr>`;
-};
+app.get("/test", (req, res) => {
+    console.log("Test route hit!");
+    res.send("Server is working!");
+});
 
-const renderServices = (serviceData: { serviceId: string; serviceName: string; serviceDescription: string }[]): string => {
-    return serviceData.map((service, index) => `
-        <h3>Service ${index + 1}</h3>
-        <table>
-            <tr><th>ID</th><td>${service.serviceId}</td></tr>
-            <tr><th>Name</th><td>${service.serviceName}</td></tr>
-            <tr><th>Description</th><td>${service.serviceDescription}</td></tr>
-        </table>
-    `).join('');
-};
 
-async function fetchData(projectId: string): Promise<{
-    projectData?: any;
-    serviceData?: any[];
-    error?: string;
-}> {
+// Fetch data from Supabase
+async function fetchData(projectId: string) {
     try {
-        if (!projectId) throw new Error('Invalid or missing Project ID');
+        if (!projectId) {
+            throw new Error("Invalid or missing Project ID");
+        }
+
+        console.log(`Fetching data for projectId: ${projectId}`);
 
         const { data: projectData, error: projectError } = await supabase
-            .from('projects')
-            .select('*')
-            .eq('projectId', projectId)
+            .from("projects")
+            .select("*")
+            .eq("projectId", projectId)
             .single();
 
-        if (projectError || !projectData) throw new Error(`Project not found for ID: ${projectId}`);
+        if (projectError) {
+            throw new Error(`Project not found for Project ID: ${projectId}`);
+        }
+
+        const { data: elementData, error: elementError } = await supabase
+            .from("web-elements")
+            .select("*")
+            .eq("projectId", projectId)
+            .limit(1);
 
         const { data: serviceData, error: serviceError } = await supabase
-            .from('services')
-            .select('*')
-            .eq('projectId', projectId);
+            .from("services")
+            .select("*")
+            .eq("projectId", projectId);
 
-        if (serviceError) throw new Error(serviceError.message);
+        let parsedTextboxData = null;
+        let parsedFooterData = null;
+
+        if (elementData && elementData.length > 0) {
+            try {
+                parsedTextboxData = elementData[0].textBoxData ? JSON.parse(elementData[0].textBoxData) : null;
+                parsedFooterData = elementData[0].footerData ? JSON.parse(elementData[0].footerData) : null;
+            } catch (parseError) {
+                console.error("Failed to parse JSON data:", (parseError as Error).message);
+            }
+        }
 
         return {
             projectData,
-            serviceData: serviceData || []
+            serviceData: serviceData || [],
+            textboxData: parsedTextboxData,
+            footerData: parsedFooterData,
         };
-    } catch (error: unknown) {
-        return { error: error instanceof Error ? error.message : 'Unknown error' };
+    } catch (error) {
+        console.error(`[Fetch Data] Error for Project ID ${projectId}:`, (error as Error).message);
+        return { error };
     }
 }
 
-app.get('/:projectId', async (req: Request, res: Response) => {
+app.get("/test-fetch", async (req: Request, res: Response): Promise<void> => {
+    const projectId = "056394f5-cf49-492d-85b0-9fa186f1f0ba";
+
+    console.log(`Testing fetchData for Project ID: ${projectId}`);
+
+    const fetchResult = await fetchData(projectId);
+
+    if (fetchResult.error) {
+        console.error("Fetch Data Error:", fetchResult.error);
+        res.status(500).json({ error: (fetchResult.error as Error).message });
+        return;
+    }
+
+    res.status(200).json(fetchResult);
+});
+
+app.get("/", (req: Request, res: Response) => {
+    const sampleProjectId = "056394f5-cf49-492d-85b0-9fa186f1f0ba"; // Use a valid project ID from your database
+
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Server Running</title>
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                h1 { color: #4CAF50; }
+                p { font-size: 18px; }
+                a { text-decoration: none; color: #2196F3; font-weight: bold; }
+            </style>
+        </head>
+        <body>
+            <h1>✅ Server is Running!</h1>
+            <p>Use the following endpoints to fetch data:</p>
+            <ul>
+                <li><a href="/test-fetch">Test Fetch Data</a></li>
+                <li><a href="/viewer/${sampleProjectId}">Viewer Page</a></li>
+                <li><a href="/${sampleProjectId}">Project Details</a></li>
+            </ul>
+        </body>
+        </html>
+    `);
+});
+
+
+//  Route to fetch project details
+app.get("/:projectId", async (req: Request, res: Response) => {
     const projectId = req.params.projectId;
 
-    if (!projectId || projectId === 'null') {
-        res.status(400).send('<h1>Invalid Project Request</h1>');
+    if (!projectId || projectId === "null") {
+        res.status(400).send("<h1>Invalid Project Request</h1>");
         return;
     }
 
     const fetchResult = await fetchData(projectId);
 
     if (fetchResult.error) {
-        res.status(404).send(`<h1>Error: ${fetchResult.error}</h1>`);
+        res.status(404).send(`<h1>Error: ${(fetchResult.error as Error).message}</h1>`);
     } else {
-        const { projectData, serviceData = [] } = fetchResult;
+        const { projectData, serviceData } = fetchResult;
 
         res.send(`
             <!DOCTYPE html>
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Project Details</title>
                 <style>
-                    body { font-family: Arial; margin: 20px; padding: 20px; background-color: #f9f9f9; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { border: 1px solid #ddd; padding: 8px; }
-                    th { background-color: #f4f4f4; font-weight: bold; }
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f4f4f4; }
                 </style>
             </head>
             <body>
                 <h1>Project Details</h1>
-                <h2>General Information</h2>
                 <table>
-                    ${renderRow('Project Title', projectData.projectTitle)}
-                    ${renderRow('Project ID', projectData.projectId)}
-                    ${renderRow('Description', projectData.projectDescription)}
+                    <tr><th>Title</th><td>${projectData.projectTitle}</td></tr>
+                    <tr><th>Description</th><td>${projectData.projectDescription}</td></tr>
+                    <tr><th>Domain</th><td>${projectData.projectDomain}</td></tr>
+                    <tr><th>Status</th><td>${projectData.projectStatus}</td></tr>
+                    <tr><th>Last Updated</th><td>${format(new Date(projectData.lastUpdated), "yyyy-MM-dd HH:mm:ss")}</td></tr>
                 </table>
+
                 <h2>Services</h2>
-                ${serviceData.length ? renderServices(serviceData) : '<h3>No Services Available</h3>'}
+                ${serviceData && serviceData.length > 0 
+                    ? serviceData.map((service, index) => `
+                        <h3>Service ${index + 1}</h3>
+                        <table>
+                            <tr><th>ID</th><td>${service.serviceId}</td></tr>
+                            <tr><th>Name</th><td>${service.serviceName}</td></tr>
+                            <tr><th>Description</th><td>${service.serviceDescription}</td></tr>
+                        </table>
+                    `).join('')
+                    : "<p>No services available</p>"
+                }
+
+                <button onclick="redirectToViewer()">Go to Viewer</button>
+                <script>
+                    function redirectToViewer() {
+                        const projectId = "${projectId}";
+                        window.location.href = "http://localhost:" + ${port} + "/viewer/" + projectId;
+                    }
+                </script>
             </body>
             </html>
         `);
     }
 });
 
+//  Viewer Page
+app.get("/viewer/:projectId", async (req: Request, res: Response) => {
+    const projectId = req.params.projectId;
+
+    console.log(`Received request for viewer: ${projectId}`);
+
+    if (!projectId || projectId === "null") {
+        res.status(400).send("<h1>Invalid Project Request</h1>");
+        return;
+    }
+
+    const fetchResult = await fetchData(projectId);
+
+    if (fetchResult.error) {
+        res.status(404).send(`<h1>Error: ${(fetchResult.error as Error).message}</h1>`);
+    } else {
+        const { textboxData, footerData } = fetchResult;
+
+        textBoxContent = textboxData ? new TextBoxContent(textboxData) : null;
+        footerContent = footerData ? new FooterContent(footerData) : null;
+
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Project Viewer</title>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; }
+                    .content { max-width: 800px; margin: 0 auto; padding: 20px; }
+                    .footer { margin-top: 40px; color: gray; font-size: 0.9rem; }
+                </style>
+            </head>
+            <body>
+                <div class="content">
+                    <h1>Project Viewer</h1>
+                    ${textboxData ? `<p>${textboxData.content}</p>` : "<p>No textbox data available</p>"}
+                    ${footerData ? `<div class="footer">${footerData.copyRight}</div>` : "<p>No footer data available</p>"}
+                </div>
+                <button onclick="redirectToDetails()">View Details</button>
+                <script>
+                    function redirectToDetails() {
+                        const projectId = "${projectId}";
+                        window.location.href = "http://localhost:" + ${port} + "/" + projectId;
+                    }
+                </script>
+            </body>
+            </html>
+        `);
+    }
+});
+
+
+// Start the server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
