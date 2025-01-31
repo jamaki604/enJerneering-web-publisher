@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "viewer": "node ./main/index.js"
+    "viewer": "node ./main/index.js",
+    "test": "vitest"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.46.1",
@@ -22,8 +23,15 @@
     "typescript": "^5.6.3"
   },
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/node": "^22.9.1",
+    "@types/supertest": "^6.0.2",
+    "@vitest/coverage-istanbul": "^3.0.4",
+    "@vitest/coverage-v8": "^3.0.4",
+    "@vitest/ui": "^3.0.4",
     "concurrently": "^9.1.0",
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "supertest": "^7.0.0",
+    "vitest": "^3.0.4"
   }
 }
