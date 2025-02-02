@@ -12,18 +12,20 @@ export default {
     "./*.{html,js,ts,tsx}",
     "./public/**/*.{html,js,ts,tsx}",
   ],
-  darkMode: 'class', // ✅ Simplified dark mode handling
+  darkMode: "class", // ✅ Simplified dark mode handling
   theme: {
     extend: {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        "linear-1": "linear-gradient(0deg, rgba(0, 0, 0, 0.80), rgba(0, 0, 0, 0.80))",
+        "gradient-conic":
+          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "linear-1":
+          "linear-gradient(0deg, rgba(0, 0, 0, 0.80), rgba(0, 0, 0, 0.80))",
         "empty-workspace": "url(/img/en-jerneering-ui/empty-workspace-bg.png)",
       },
-      opacity: {
-        15: 0.15, // ✅ Corrected numeric value
-      },
+      // opacity: {
+      //   15: 0.15, // ✅ Corrected numeric value
+      // },
       colors: {
         primary: {
           900: "#E09D37",
@@ -98,8 +100,10 @@ export default {
         ...defaultTheme.boxShadow,
         menu: "0px 4px 6px rgba(0, 0, 0, 0.05), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
         tooltip: "0px 2px 12px rgba(0, 0, 0, 0.1)",
-        thumbnail: "0px 1px 2px -1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.1)",
-        "comp-toolbar": "0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1)",
+        thumbnail:
+          "0px 1px 2px -1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.1)",
+        "comp-toolbar":
+          "0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1)",
         checkbox: "0px 0px 0px 2px rgba(23, 23, 23, 0.1)",
       },
       gridTemplateColumns: {
@@ -114,8 +118,8 @@ export default {
     },
   },
   plugins: [
-    require("tailwindcss-animate"), 
-    require("@tailwindcss/forms"), 
-    require("@tailwindcss/typography"), 
+    require("tailwindcss-animate"),
+    require("@tailwindcss/forms"),
+    require("@tailwindcss/typography"),
   ],
 } satisfies Config;
