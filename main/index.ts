@@ -4,6 +4,12 @@ import dotenv from "dotenv";
 import { format } from "date-fns";
 import path from "path";
 
+import React from "react";
+import ReactDOMServer from "react-dom/server";
+
+// Import your FooterType1 component (adjust the path as needed)
+import FooterType1 from "../components/Footer/_FooterType1";
+
 // Import styling and content components
 import TextBoxStyle from "../public/componentHTML/style/textBoxStyle";
 import TextBoxContent from "../public/componentHTML/content/textBoxContent";
@@ -22,9 +28,11 @@ const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 const app = express();
 const port = process.env.PORT ? parseInt(process.env.PORT) : 4000;
 
+app.use(express.static(path.join(__dirname, "..", "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, "public")));
+
+
 
 // Initialize styling and content components
 let textBoxContent: TextBoxContent | null = null;
@@ -272,62 +280,13 @@ app.get("/viewer/:projectId", async (req: Request, res: Response) => {
     }
 });
 
-app.get("/debug-project/:projectId", async (req: Request, res: Response): Promise<void> => {
-    const { projectId } = req.params;
+app.get("/debug-footer/:projectId", async (req: Request, res: Response): Promise<void> => {
+    const projectId = req.params.projectId;
+
+    console.log(`Received request for debug: ${projectId}`);
+
     try {
-      // Query the project data
-      const { data: projectData, error: projErr } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("projectId", projectId)
-        .single();
-      if (projErr) {
-        throw new Error(`Project error: ${projErr.message}`);
-      }
-  
-      // Query designs related to the project
-      const { data: designData, error: designErr } = await supabase
-        .from("designs")
-        .select("*")
-        .eq("projectId", projectId);
-      if (designErr) {
-        throw new Error(`Design error: ${designErr.message}`);
-      }
-  
-      // Get all design IDs from the project
-      const designIds = designData?.map((design: any) => design.designId) || [];
-  
-      // Query pages that belong to any of these designs
-      const { data: pageData, error: pageErr } = await supabase
-        .from("pages")
-        .select("*")
-        .in("designId", designIds);
-      if (pageErr) {
-        throw new Error(`Page error: ${pageErr.message}`);
-      }
-  
-      // Get all page IDs from the pages fetched
-      const pageIds = pageData?.map((page: any) => page.pageId) || [];
-  
-      // Query layers that belong to these pages
-      const { data: layerData, error: layerErr } = await supabase
-        .from("layers")
-        .select("*")
-        .in("pageId", pageIds);
-      if (layerErr) {
-        throw new Error(`Layer error: ${layerErr.message}`);
-      }
-  
-      // Query services related to the project
-      const { data: serviceData, error: serviceErr } = await supabase
-        .from("services")
-        .select("*")
-        .eq("projectId", projectId);
-      if (serviceErr) {
-        throw new Error(`Service error: ${serviceErr.message}`);
-      }
-  
-      // Query web elements for the project
+      // Query the web-elements table for the given projectId
       const { data: webElementsData, error: webElementsErr } = await supabase
         .from("web-elements")
         .select("*")
@@ -337,27 +296,37 @@ app.get("/debug-project/:projectId", async (req: Request, res: Response): Promis
         throw new Error(`WebElements error: ${webElementsErr.message}`);
       }
   
-      // Combine the fetched data into one object
-      const combinedData = {
-        project: projectData,
-        designs: designData,
-        pages: pageData,
-        layers: layerData,
-        services: serviceData,
-        webElements: webElementsData,
-      };
+      // Parse the footerData from the web-elements record (if available)
+      const footerData = webElementsData?.footerData ? JSON.parse(webElementsData.footerData) : {};
   
-      // Log the combined data as formatted JSON to the console
-      console.log("Combined Project Data:", JSON.stringify(combinedData, null, 2));
+      // Log the footer data in JSON format for debugging
+      console.log("Footer Data:", JSON.stringify(footerData, null, 2));
   
-      // Return the combined data as the response
-      res.status(200).json(combinedData);
+      // Render the FooterType1 component to an HTML string
+      const footerHtml = ReactDOMServer.renderToString(React.createElement(FooterType1, { data: footerData }));
+  
+      // Create an HTML page that includes the rendered footer
+      const fullHtml = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Footer Debug</title>
+            <link rel="stylesheet" href="/globals.css">
+        </head>
+        <body>
+            <div id="footer">${footerHtml}</div>
+        </body>
+        </html>
+      `;
+  
+      res.status(200).send(fullHtml);
     } catch (error) {
-      console.error("Error fetching project data:", (error as Error).message);
+      console.error("Error fetching footer data:", (error as Error).message);
       res.status(500).json({ error: (error as Error).message });
     }
   });
-  
 
 // Start the server
 app.listen(port, () => {

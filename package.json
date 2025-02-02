@@ -3,13 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "viewer": "ts-node ./main/index.ts",
+    "build:css": "postcss globals.css -o ./public/globals.css",
+    "viewer": "npm run build:css && ts-node ./main/index.ts",
     "test": "vitest"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.46.1",
+    "@tailwindcss/postcss": "^4.0.3",
     "cookie-parser": "~1.4.4",
     "date-fns": "^4.1.0",
     "debug": "~2.6.9",
@@ -20,6 +22,7 @@
     "morgan": "~1.9.1",
     "next": "^15.1.6",
     "postcss-cli": "^11.0.0",
+    "postcss-import": "^16.1.0",
     "pug": "^3.0.3"
   },
   "devDependencies": {
