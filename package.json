@@ -8,6 +8,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.46.1",
@@ -21,9 +22,13 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
     "next": "^15.1.6",
+    "next-swagger-doc": "^0.4.1",
     "postcss-cli": "^11.0.0",
     "postcss-import": "^16.1.0",
-    "pug": "^3.0.3"
+    "primeicons": "^7.0.0",
+    "primereact": "^10.9.2",
+    "pug": "^3.0.3",
+    "tailwind-variants": "^0.3.1"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.8",

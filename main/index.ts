@@ -7,8 +7,9 @@ import path from "path";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 
-// Import your FooterType1 component (adjust the path as needed)
+// Import HeaderFooterType component 
 import FooterType1 from "../components/Footer/_FooterType1";
+import HeaderType1 from "../components/Header/_HeaderType1";
 
 // Import styling and content components
 import TextBoxStyle from "../public/componentHTML/style/textBoxStyle";
@@ -136,7 +137,10 @@ app.get("/", (req: Request, res: Response) => {
                 body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
                 h1 { color: #4CAF50; }
                 p { font-size: 18px; }
-                a { text-decoration: none; color: #2196F3; font-weight: bold; }
+                a, button { text-decoration: none; color: #2196F3; font-weight: bold; cursor: pointer; }
+                button { padding: 10px 20px; background-color: #4CAF50; border: none; color: white; border-radius: 5px; margin: 10px; }
+                button:hover { background-color: #45a049; }
+                input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin: 10px; }
             </style>
         </head>
         <body>
@@ -147,6 +151,19 @@ app.get("/", (req: Request, res: Response) => {
                 <li><a href="/viewer/${sampleProjectId}">Viewer Page</a></li>
                 <li><a href="/${sampleProjectId}">Project Details</a></li>
             </ul>
+            <br>
+            <input type="text" id="projectIdInput" placeholder="Enter Project ID">
+            <button onclick="redirectToDebug()">Go to Debug</button>
+            <script>
+                function redirectToDebug() {
+                    const projectId = document.getElementById('projectIdInput').value;
+                    if (projectId) {
+                        window.location.href = '/debug/' + projectId;
+                    } else {
+                        alert('Please enter a Project ID');
+                    }
+                }
+            </script>
         </body>
         </html>
     `);
@@ -280,53 +297,58 @@ app.get("/viewer/:projectId", async (req: Request, res: Response) => {
     }
 });
 
-app.get("/debug-footer/:projectId", async (req: Request, res: Response): Promise<void> => {
+app.get("/debug/:projectId", async (req: Request, res: Response): Promise<void> => {
     const projectId = req.params.projectId;
 
     console.log(`Received request for debug: ${projectId}`);
 
     try {
-      // Query the web-elements table for the given projectId
-      const { data: webElementsData, error: webElementsErr } = await supabase
-        .from("web-elements")
-        .select("*")
-        .eq("projectId", projectId)
-        .single();
-      if (webElementsErr) {
-        throw new Error(`WebElements error: ${webElementsErr.message}`);
-      }
-  
-      // Parse the footerData from the web-elements record (if available)
-      const footerData = webElementsData?.footerData ? JSON.parse(webElementsData.footerData) : {};
-  
-      // Log the footer data in JSON format for debugging
-      console.log("Footer Data:", JSON.stringify(footerData, null, 2));
-  
-      // Render the FooterType1 component to an HTML string
-      const footerHtml = ReactDOMServer.renderToString(React.createElement(FooterType1, { data: footerData }));
-  
-      // Create an HTML page that includes the rendered footer
-      const fullHtml = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Footer Debug</title>
-            <link rel="stylesheet" href="/globals.css">
-        </head>
-        <body>
-            <div id="footer">${footerHtml}</div>
-        </body>
-        </html>
-      `;
-  
-      res.status(200).send(fullHtml);
+        const { data: webElementsData, error: webElementsErr } = await supabase
+            .from("web-elements")
+            .select("*")
+            .eq("projectId", projectId)
+            .single();
+
+        if (webElementsErr) {
+            throw new Error(`WebElements error: ${webElementsErr.message}`);
+        }
+
+        const headerData = webElementsData?.headerData ? JSON.parse(webElementsData.headerData) : {};
+        const footerData = webElementsData?.footerData ? JSON.parse(webElementsData.footerData) : {};
+
+        console.log("Header Data:", JSON.stringify(headerData, null, 2));
+        console.log("Footer Data:", JSON.stringify(footerData, null, 2));
+
+        const headerHtml = ReactDOMServer.renderToString(React.createElement(HeaderType1, { data: headerData }));
+        const footerHtml = ReactDOMServer.renderToString(React.createElement(FooterType1, { data: footerData }));
+
+        const fullHtml = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Header & Footer Debug</title>
+                <link rel="stylesheet" href="/globals.css">
+                <style>
+                    .btn-debug { padding: 10px 20px; background-color: #4CAF50; border: none; color: white; border-radius: 5px; margin: 10px; cursor: pointer; }
+                    .btn-debug:hover { background-color: #45a049; }
+                </style>
+            </head>
+            <body>
+                <div id="header">${headerHtml}</div>
+                <div id="footer">${footerHtml}</div>
+                <button class="btn-debug" onclick="window.location.href='/'">Back to Main Page</button>
+            </body>
+            </html>
+        `;
+
+        res.status(200).send(fullHtml);
     } catch (error) {
-      console.error("Error fetching footer data:", (error as Error).message);
-      res.status(500).json({ error: (error as Error).message });
+        console.error("Error fetching header/footer data:", (error as Error).message);
+        res.status(500).json({ error: (error as Error).message });
     }
-  });
+});
 
 // Start the server
 app.listen(port, () => {
