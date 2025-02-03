@@ -132,7 +132,7 @@ app.get("/", (req: Request, res: Response) => {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Server Running</title>
+            <title>Enjerneering WebInfoViewer</title>
             <style>
                 body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
                 h1 { color: #4CAF50; }
@@ -313,7 +313,44 @@ app.get("/debug/:projectId", async (req: Request, res: Response): Promise<void> 
             throw new Error(`WebElements error: ${webElementsErr.message}`);
         }
 
-        const headerData = webElementsData?.headerData ? JSON.parse(webElementsData.headerData) : {};
+        const { data: designData, error: designErr } = await supabase
+            .from("designs")
+            .select("*")
+            .eq("projectId", projectId)
+            .single();
+
+        if (designErr) {
+            throw new Error(`WebElements error: ${designErr.message}`);
+        }
+
+        let designId = designData?.designId
+
+        const { data: pagesData, error: pagesErr } = await supabase
+            .from("pages")
+            .select("*")
+            .eq("designId", designId);
+
+        if (pagesErr) {
+            throw new Error(`WebElements error: ${pagesErr.message}`);
+        }
+
+        console.log("Pages Data", pagesData)
+        let pageId = pagesData?.find(page => page.pageTitle === "Landing Page").pageId;
+
+        const { data: layerData, error: layerErr } = await supabase
+            .from("layers")
+            .select("*")
+            .eq("pageId", pageId);
+
+        if (layerErr) {
+            throw new Error(`WebElements error: ${layerErr.message}`);
+        }
+
+        console.log("Layer Data: ", layerData)
+
+        const headerLayer = layerData?.find(layer => layer.componentType === "Header");
+        const headerData = headerLayer ? JSON.parse(headerLayer.content) : {};
+
         const footerData = webElementsData?.footerData ? JSON.parse(webElementsData.footerData) : {};
 
         console.log("Header Data:", JSON.stringify(headerData, null, 2));
