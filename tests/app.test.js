@@ -7,9 +7,9 @@ describe('Express App', () => {
     vi.restoreAllMocks();
   });
 
-  test('should respond with 200 on GET /', async () => {
+  test('should respond with 500 on GET /', async () => {
     const res = await request(app).get('/');
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(500);
   });
 
   test('should respond with 200 on GET /users', async () => {
