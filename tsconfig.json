@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "jsx": "react",
     "target": "ES2020",
     "module": "CommonJS",
     "strict": true,
@@ -12,6 +13,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["main/**/*.ts", "tests/**/*.ts"],
+  "include": ["main/**/*.ts", "tests/**/*.ts", "tests/header1.test.js"],
   "exclude": ["node_modules"]
 }
