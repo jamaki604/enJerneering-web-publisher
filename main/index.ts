@@ -83,6 +83,39 @@ async function fetchData(projectId: string) {
             .select("*")
             .eq("projectId", projectId);
 
+        const { data: designData, error: designErr } = await supabase
+            .from("designs")
+            .select("*")
+            .eq("projectId", projectId);
+
+        if (designErr) {
+            throw new Error(`WebElements error: ${designErr.message}`);
+        }
+
+        let designId = designData[designData.length-1]?.designId
+
+        const { data: pagesData, error: pagesErr } = await supabase
+            .from("pages")
+            .select("*")
+            .eq("designId", designId);
+
+        if (pagesErr) {
+            throw new Error(`WebElements error: ${pagesErr.message}`);
+        }
+
+        console.log("Pages Data", pagesData)
+        let pageId = pagesData?.find(page => page.pageTitle === "Landing Page").pageId;
+
+        const { data: layerData, error: layerErr } = await supabase
+            .from("layers")
+            .select("*")
+            .eq("pageId", pageId);
+
+        if (layerErr) {
+            throw new Error(`WebElements error: ${layerErr.message}`);
+        }
+
+
         let parsedTextboxData: { content: string } | null = null;
         let parsedFooterData = null;
 
@@ -100,6 +133,9 @@ async function fetchData(projectId: string) {
             serviceData: serviceData || [],
             textboxData: parsedTextboxData,
             footerData: parsedFooterData,
+            designData,
+            pagesData,
+            layerData
         };
     } catch (error) {
         console.error(`[Fetch Data] Error for Project ID ${projectId}:`, (error as Error).message);
@@ -108,7 +144,7 @@ async function fetchData(projectId: string) {
 }
 
 app.get("/test-fetch", async (req: Request, res: Response): Promise<void> => {
-    const projectId = "056394f5-cf49-492d-85b0-9fa186f1f0ba";
+    const projectId = "86f738b0-bc2e-4f2c-91d3-89626e8f3a4e";
 
     console.log(`Testing fetchData for Project ID: ${projectId}`);
 
@@ -317,13 +353,12 @@ app.get("/debug/:projectId", async (req: Request, res: Response): Promise<void> 
             .from("designs")
             .select("*")
             .eq("projectId", projectId)
-            .single();
 
         if (designErr) {
             throw new Error(`WebElements error: ${designErr.message}`);
         }
 
-        let designId = designData?.designId
+        let designId = designData[designData.length - 1]?.designId
 
         const { data: pagesData, error: pagesErr } = await supabase
             .from("pages")
