@@ -147,7 +147,7 @@ async function fetchData(projectId: string) {
 }
 
 app.get("/test-fetch", async (req: Request, res: Response): Promise<void> => {
-    const projectId = "86f738b0-bc2e-4f2c-91d3-89626e8f3a4e";
+    const projectId = "195c502b-81ca-4f56-8442-aa9659f4baef";
 
     console.log(`Testing fetchData for Project ID: ${projectId}`);
 
@@ -163,7 +163,7 @@ app.get("/test-fetch", async (req: Request, res: Response): Promise<void> => {
 });
 
 app.get("/", (req: Request, res: Response) => {
-    const sampleProjectId = "056394f5-cf49-492d-85b0-9fa186f1f0ba"; // Use a valid project ID from your database
+    const sampleProjectId = "195c502b-81ca-4f56-8442-aa9659f4baef";
 
     res.send(`
         <!DOCTYPE html>
