@@ -391,3 +391,6 @@ app.get("/debug/:projectId", async (req: Request, res: Response): Promise<void> 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
+
+export { fetchData };
+export default app;
