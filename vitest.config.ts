@@ -22,6 +22,8 @@ export default defineConfig({
         'package-lock.json',
         'postcss.config.js',
         'vitest.setup.ts',
+        'test',
+        '.gitignore'
       ],
     },
   },

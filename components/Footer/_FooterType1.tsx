@@ -33,9 +33,6 @@ const FooterType1: React.FC<FooterProps> = ({ data }) => {
   return (
     <div className="z-30 bg-gray-50">
       <footer aria-labelledby="footer-heading">
-        <h2 id="footer-heading" className="sr-only">
-          Footer
-        </h2>
         <div className="px-6 py-10 lg:px-20">
           <div className="flex flex-col gap-8 xl:flex-row xl:gap-20">
             <div className="flex flex-col space-y-6 flex-shrink-0 xl:max-w-[400px]">

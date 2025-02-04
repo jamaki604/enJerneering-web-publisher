@@ -10,6 +10,9 @@ import ReactDOMServer from "react-dom/server";
 // Import HeaderFooterType component 
 import FooterType1 from "../components/Footer/_FooterType1";
 import HeaderType1 from "../components/Header/_HeaderType1";
+import ContactType1 from "../components/Contact/_ContactType1";
+import CallToActionType1 from "../components/CallToAction/_CallToActionType1";
+import MainContentType1 from "../components/MainContent/_MainContentType1";
 
 // Import styling and content components
 import TextBoxStyle from "../public/componentHTML/style/textBoxStyle";
@@ -83,6 +86,39 @@ async function fetchData(projectId: string) {
             .select("*")
             .eq("projectId", projectId);
 
+        const { data: designData, error: designErr } = await supabase
+            .from("designs")
+            .select("*")
+            .eq("projectId", projectId);
+
+        if (designErr) {
+            throw new Error(`WebElements error: ${designErr.message}`);
+        }
+
+        let designId = designData[designData.length-1]?.designId
+
+        const { data: pagesData, error: pagesErr } = await supabase
+            .from("pages")
+            .select("*")
+            .eq("designId", designId);
+
+        if (pagesErr) {
+            throw new Error(`WebElements error: ${pagesErr.message}`);
+        }
+
+        console.log("Pages Data", pagesData)
+        let pageId = pagesData?.find(page => page.pageTitle === "Landing Page").pageId;
+
+        const { data: layerData, error: layerErr } = await supabase
+            .from("layers")
+            .select("*")
+            .eq("pageId", pageId);
+
+        if (layerErr) {
+            throw new Error(`WebElements error: ${layerErr.message}`);
+        }
+
+
         let parsedTextboxData: { content: string } | null = null;
         let parsedFooterData = null;
 
@@ -100,6 +136,9 @@ async function fetchData(projectId: string) {
             serviceData: serviceData || [],
             textboxData: parsedTextboxData,
             footerData: parsedFooterData,
+            designData,
+            pagesData,
+            layerData
         };
     } catch (error) {
         console.error(`[Fetch Data] Error for Project ID ${projectId}:`, (error as Error).message);
@@ -108,7 +147,7 @@ async function fetchData(projectId: string) {
 }
 
 app.get("/test-fetch", async (req: Request, res: Response): Promise<void> => {
-    const projectId = "056394f5-cf49-492d-85b0-9fa186f1f0ba";
+    const projectId = "195c502b-81ca-4f56-8442-aa9659f4baef";
 
     console.log(`Testing fetchData for Project ID: ${projectId}`);
 
@@ -124,7 +163,7 @@ app.get("/test-fetch", async (req: Request, res: Response): Promise<void> => {
 });
 
 app.get("/", (req: Request, res: Response) => {
-    const sampleProjectId = "056394f5-cf49-492d-85b0-9fa186f1f0ba"; // Use a valid project ID from your database
+    const sampleProjectId = "195c502b-81ca-4f56-8442-aa9659f4baef";
 
     res.send(`
         <!DOCTYPE html>
@@ -317,13 +356,12 @@ app.get("/debug/:projectId", async (req: Request, res: Response): Promise<void> 
             .from("designs")
             .select("*")
             .eq("projectId", projectId)
-            .single();
 
         if (designErr) {
             throw new Error(`WebElements error: ${designErr.message}`);
         }
 
-        let designId = designData?.designId
+        let designId = designData[designData.length - 1]?.designId
 
         const { data: pagesData, error: pagesErr } = await supabase
             .from("pages")
@@ -359,6 +397,22 @@ app.get("/debug/:projectId", async (req: Request, res: Response): Promise<void> 
         const headerHtml = ReactDOMServer.renderToString(React.createElement(HeaderType1, { data: headerData }));
         const footerHtml = ReactDOMServer.renderToString(React.createElement(FooterType1, { data: footerData }));
 
+        const renderSection = (layer: { content: string; componentType: any; }) => {
+            let layerContent = JSON.parse(layer.content)
+            switch(layer.componentType){
+                case "Header":
+                    return ReactDOMServer.renderToString(React.createElement(HeaderType1, { data: layerContent }));
+                case "MainContent":
+                    return ReactDOMServer.renderToString(React.createElement(MainContentType1, { data: layerContent }));
+                case "CallToAction":
+                    return ReactDOMServer.renderToString(React.createElement(CallToActionType1, { data: layerContent }));
+                case "Contact":
+                    return ReactDOMServer.renderToString(React.createElement(ContactType1, { data: layerContent }));
+                default:
+                    return ""
+            }
+        }
+
         const fullHtml = `
             <!DOCTYPE html>
             <html lang="en">
@@ -373,7 +427,12 @@ app.get("/debug/:projectId", async (req: Request, res: Response): Promise<void> 
                 </style>
             </head>
             <body>
-                <div id="header">${headerHtml}</div>
+                ${layerData && layerData.length > 0 
+                    ? layerData.map((layer) => `
+                        <div id="${layer.componentType}">${renderSection(layer)}</div>
+                    `).join('')
+                    : "<></>"
+                }
                 <div id="footer">${footerHtml}</div>
                 <button class="btn-debug" onclick="window.location.href='/'">Back to Main Page</button>
             </body>
