@@ -1,7 +1,7 @@
 import fs from 'fs';
-import { supabase } from './client'; // Ensure this is correctly imported
+import { supabase } from './client';
 
-async function fetchJson(projectId: string): Promise<void> {
+export async function fetchJson(projectId: string): Promise<void> {
   try {
     // Fetch data from 'projects' with specific id
     const { data, error } = await supabase
