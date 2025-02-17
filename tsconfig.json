@@ -1,18 +1,33 @@
 {
   "compilerOptions": {
-    "jsx": "react",
-    "target": "ES2020",
-    "module": "CommonJS",
-    "strict": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
     "skipLibCheck": true,
+    "strict": true,
     "noEmit": true,
-    "baseUrl": "./",
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "types": ["node"],
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@/*": ["src/*"]
+      "@internalComponents/*": ["./app/_components/*"],
+      "@components/*": ["./app/_sections/*"],
+      "@lib/*": ["./app/_lib/*"],
+      "@providers/*": ["./app/_providers/*"],
+      "@internalSupabase/*": ["./supabase/*"],
+      "@/*": ["./app/*"]
     }
   },
-  "include": ["main/**/*.ts", "tests/**/*.ts", "tests/header1.test.js"],
+  "include": ["next-env.d.ts", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

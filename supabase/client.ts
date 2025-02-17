@@ -1,15 +1,17 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
+import { createBrowserClient } from "@supabase/ssr";
+import { Database } from "../database.types";
 
-dotenv.config();
+export function createClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// Ensure environment variables exist
-const SUPABASE_URL: string | undefined = process.env.SUPABASE_URL;
-const SUPABASE_KEY: string | undefined = process.env.SUPABASE_KEY;
+  if (!url) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL is not defined");
+  }
+  if (!anonKey) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined");
+  }
 
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-    throw new Error("Missing Supabase configuration: SUPABASE_URL or SUPABASE_KEY");
+  // Create a Supabase client with project's credentials
+  return createBrowserClient<Database>(url, anonKey);
 }
-
-// Create and export the Supabase client
-export const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
