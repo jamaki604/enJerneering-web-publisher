@@ -39,7 +39,7 @@ const FooterType1: React.FC<FooterProps> = ({ data }) => {
         <div className="px-6 py-10 lg:px-20">
           <div className="flex flex-col gap-8 xl:flex-row xl:gap-20">
             <div className="flex flex-col space-y-6 flex-shrink-0 xl:max-w-[400px]">
-              <Image src={logo} alt="Logo" width={230} height={48} />
+              <Image src={logo?? ""} alt="Logo" width={230} height={48} />
               {showContentFlags.slogan === "on" && (
                 <p className="text-base font-normal text-neutral-500">
                   {slogan}

@@ -7,7 +7,14 @@ export type ContactData = {
   phoneLabel?: string;
   mailLabel?: string;
   addressLabel?: string;
-  primaryLabel: string;
   imgUrl?: string;
   mapSrc?: string;
+  contactAddress: boolean;
+  contactEmail: boolean;
+  contactPhone: boolean;
+  nameField: boolean;
+  emailField: boolean;
+  phoneField: boolean;
+  messageField: boolean;
+  textColor: string;
 };

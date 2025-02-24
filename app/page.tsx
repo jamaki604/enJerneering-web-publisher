@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import FooterType1 from "@components/Footer/_FooterType1";
 import HeaderType1 from "@components/Header/_HeaderType1";
 import ContactType1 from "@components/Contact/_ContactType1";
@@ -10,11 +10,13 @@ import MainContentType1 from "@components/MainContent/_MainContentType1";
 import { createClient } from "../supabase/client";
 
 const supabase = createClient();
-const projectId = "195c502b-81ca-4f56-8442-aa9659f4baef";
+
 
 const BuilderPage: React.FC = () => {
-  const [headerData, setHeaderData] = useState<any>(null);
-  const [footerData, setFooterData] = useState<any>(null);
+
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get("projectId");  // this format in url ' localhost:4000/?projectId=195c502b-81ca-4f56-8442-aa9659f4baef '
+
   const [sections, setSections] = useState<JSX.Element[]>([]);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ const BuilderPage: React.FC = () => {
         const { data: webElementsData, error: webElementsErr } = await supabase
           .from("web-elements")
           .select("*")
-          .eq("projectId", projectId)
+          .eq("projectId", projectId ?? "")
           .single();
 
         if (webElementsErr) {
@@ -84,12 +86,10 @@ const BuilderPage: React.FC = () => {
         const parsedFooterData = webElementsData?.footerData
           ? JSON.parse(webElementsData.footerData)
           : {};
+        console.log(parsedFooterData)
 
         console.log("Header Data:", JSON.stringify(parsedHeaderData, null, 2));
         console.log("Footer Data:", JSON.stringify(parsedFooterData, null, 2));
-
-        setHeaderData(parsedHeaderData);
-        setFooterData(parsedFooterData);
 
         // Render sections
         const renderedSections = (
@@ -133,7 +133,7 @@ const BuilderPage: React.FC = () => {
     }
   };
 
-  return <div className="h-full w-full">{sections} </div>;
+  return <><div className="h-full w-full">{sections} </div></> ;
 };
 
 export default BuilderPage;

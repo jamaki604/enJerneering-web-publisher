@@ -12,19 +12,29 @@ interface CallToActionProps {
 
 const CallToActionType1: React.FC<CallToActionProps> = ({ data }) => {
   const {
-    title = "Default Title",
-    subtitle = "Default Subtitle",
-    primaryLabel = "Primary Button",
-    secondaryLabel = "Secondary Button",
-    primaryUrl = "#",
-    secondaryUrl = "#",
+    title,
+    subtitle,
+    primaryLabel,
+    secondaryLabel,
+    primaryUrl,
+    secondaryUrl,
     tagLine,
     imgUrl,
+    background,
+    backgroundColor,
+    textColor,
+    isTagline
   } = data;
 
   return (
-    <div className={classNames(imgUrl ? "relative" : "", "bg-neutral-800")}>
-      {imgUrl && (
+    <div
+      className={classNames(
+        "relative",
+        background === "none" ? "bg-neutral-800" : ""
+      )}
+      style={background === "none" ? { backgroundColor } : {}}
+    >
+      {background === "image" && imgUrl && (
         <div className="absolute inset-0 z-0">
           <Image
             src={imgUrl}
@@ -42,13 +52,17 @@ const CallToActionType1: React.FC<CallToActionProps> = ({ data }) => {
       <div className="mx-auto max-w-[1440px] py-20 px-6 gap-10 lg:p-20 md:flex lg:items-center lg:justify-center lg:gap-10 relative">
         <div className="mx-auto max-w-screen-xl mt-10 flex flex-col items-center justify-center gap-10 lg:mt-0 lg:h-full">
           <div className="flex flex-col gap-6 text-center">
-            {tagLine && (
-              <span className="text-neutral-400 text-base uppercase font-bold">
+          {isTagline === "on" && (
+              <span className="text-base uppercase font-bold" style={{ color: textColor }}>
                 {tagLine}
               </span>
             )}
-            <h1 className="text-5xl leading-h4 text-gray-50">{title}</h1>
-            <h6 className="leading-6 text-gray-50">{subtitle}</h6>
+            <h1 className="text-5xl leading-h4" style={{ color: textColor }}>
+              {title}
+            </h1>
+            <h6 className="leading-6" style={{ color: textColor }}>
+              {subtitle}
+            </h6>
           </div>
 
           <ButtonActions

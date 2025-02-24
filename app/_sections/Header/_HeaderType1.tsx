@@ -3,6 +3,8 @@
 import React from "react";
 import ButtonActions from "../ButtonActions";
 import { HeaderData } from "./types/HeaderData";
+import Image from "next/image";
+import { classNames } from "@/_utils/helpers";
 
 interface HeaderProps {
   data: HeaderData;
@@ -10,31 +12,60 @@ interface HeaderProps {
 
 const HeaderType1: React.FC<HeaderProps> = ({ data }) => {
   const {
-    title = "Default Title",
-    subtitle = "Default Subtitle",
-    primaryLabel = "Primary Button",
-    secondaryLabel = "Secondary Button",
-    primaryUrl = "#",
-    secondaryUrl = "#",
+    title,
+    subtitle,
+    primaryLabel,
+    secondaryLabel,
+    primaryUrl,
+    secondaryUrl,
+    imgUrl,
+    background,
+    backgroundColor,
+    textColor,
   } = data;
 
-  return (
-    <div className="bg-gray-50">
-      <div className="mx-auto max-w-[1440px] min-h-[624px] py-20 px-6 gap-10  flex items-center justify-center lg:gap-16">
-        <div className="w-full flex flex-col items-center justify-center gap-10 lg:h-full">
-          <div className="flex flex-col gap-10 text-center">
-            <h1>{title}</h1>
-            <h6>{subtitle}</h6>
-          </div>
 
-          <ButtonActions
-            primaryLabel={primaryLabel}
-            secondaryLabel={secondaryLabel}
-            primaryUrl={primaryUrl}
-            secondaryUrl={secondaryUrl}
-          />
+  // Pierson - Add visuals for the Header data from forms
+  return (
+    <div
+          className={classNames(
+            "relative"
+          )}
+          style={background === "none" ? { backgroundColor } : {}}
+        >
+          {background === "image" && imgUrl && (
+                  <div className="absolute inset-0 z-0">
+                    <Image
+                      src={imgUrl}
+                      layout="fill"
+                      objectFit="cover"
+                      quality={100}
+                      alt="Background Image"
+                    />
+                    {/* Tint Overlay */}
+                    <div className="absolute inset-0 bg-gray-500 opacity-50"></div>{" "}
+                    {/* Gray tint */}
+                  </div>
+                )}
+        <div className="mx-auto max-w-[1440px] min-h-[624px] py-20 px-6 gap-10  flex items-center justify-center lg:gap-16 relative">
+          <div className="w-full flex flex-col items-center justify-center gap-10 lg:h-full">
+            <div className="flex flex-col gap-10 text-center">
+              <h1 className="text-5xl leading-h4" style={{ color: textColor }}>
+                {title}
+              </h1>
+              <h6 className="leading-6" style={{ color: textColor }}>
+              {subtitle}
+              </h6>
+            </div>
+
+            <ButtonActions
+              primaryLabel={primaryLabel}
+              secondaryLabel={secondaryLabel}
+              primaryUrl={primaryUrl}
+              secondaryUrl={secondaryUrl}
+            />
+          </div>
         </div>
-      </div>
     </div>
   );
 };

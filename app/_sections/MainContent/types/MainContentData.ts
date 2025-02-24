@@ -6,6 +6,9 @@ export type MainContentData = {
   imgUrl?: string;
   videoUrl?: string;
   gallery?: string[];
+  isTagline: string;
+  backgroundColor?: string;
+  textColor?: string;
 };
 
 export type SubHeading = {
