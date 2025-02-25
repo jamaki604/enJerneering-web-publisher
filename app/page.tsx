@@ -1,21 +1,26 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import FooterType1 from "@components/Footer/_FooterType1";
 import HeaderType1 from "@components/Header/_HeaderType1";
 import ContactType1 from "@components/Contact/_ContactType1";
 import CallToActionType1 from "@components/CallToAction/_CallToActionType1";
 import MainContentType1 from "@components/MainContent/_MainContentType1";
 import { createClient } from "../supabase/client";
+import TextBoxType from "@components/TextBox/_TextBox";
 
 const supabase = createClient();
-const projectId = "195c502b-81ca-4f56-8442-aa9659f4baef";
+
 
 const BuilderPage: React.FC = () => {
-  const [headerData, setHeaderData] = useState<any>(null);
-  const [footerData, setFooterData] = useState<any>(null);
+
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get("projectId");  // this format in url ' localhost:4000/?projectId=195c502b-81ca-4f56-8442-aa9659f4baef '
+
   const [sections, setSections] = useState<JSX.Element[]>([]);
+  const [footer, setFooter] = useState<JSX.Element[]>([]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,7 +31,7 @@ const BuilderPage: React.FC = () => {
         const { data: webElementsData, error: webElementsErr } = await supabase
           .from("web-elements")
           .select("*")
-          .eq("projectId", projectId)
+          .eq("projectId", projectId ?? "")
           .single();
 
         if (webElementsErr) {
@@ -84,12 +89,12 @@ const BuilderPage: React.FC = () => {
         const parsedFooterData = webElementsData?.footerData
           ? JSON.parse(webElementsData.footerData)
           : {};
+        console.log(parsedFooterData)
+
+        setFooter([<FooterType1 key={"footer"} data={parsedFooterData}/>])
 
         console.log("Header Data:", JSON.stringify(parsedHeaderData, null, 2));
         console.log("Footer Data:", JSON.stringify(parsedFooterData, null, 2));
-
-        setHeaderData(parsedHeaderData);
-        setFooterData(parsedFooterData);
 
         // Render sections
         const renderedSections = (
@@ -104,6 +109,8 @@ const BuilderPage: React.FC = () => {
     fetchData();
   }, [projectId]);
 
+  
+
   const renderSection = (layer: { content: string; componentType: string }) => {
     try {
       const layerContent = JSON.parse(layer.content);
@@ -112,15 +119,13 @@ const BuilderPage: React.FC = () => {
         case "Header":
           return <HeaderType1 key={layer.componentType} data={layerContent} />;
         case "MainContent":
-          return (
-            <MainContentType1 key={layer.componentType} data={layerContent} />
-          );
+          return <MainContentType1 key={layer.componentType} data={layerContent} />
         case "CallToAction":
-          return (
-            <CallToActionType1 key={layer.componentType} data={layerContent} />
-          );
+          return <CallToActionType1 key={layer.componentType} data={layerContent} />
         case "Contact":
           return <ContactType1 key={layer.componentType} data={layerContent} />;
+        case "TextBox": 
+          return <TextBoxType key={layer.componentType} data={layerContent}/>;
         default:
           return null;
       }
@@ -133,7 +138,9 @@ const BuilderPage: React.FC = () => {
     }
   };
 
-  return <div className="h-full w-full">{sections} </div>;
+  return <>
+  <div className="h-full w-full">{sections}{footer}</div>
+  </> ;
 };
 
 export default BuilderPage;

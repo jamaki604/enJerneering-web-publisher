@@ -4,8 +4,11 @@ export type CallToActionData = {
   primaryLabel: string;
   secondaryLabel: string;
   tagLine?: string;
-  primaryUrl?: string;
-  secondaryUrl?: string;
+  primaryUrl: string;
+  secondaryUrl: string;
   imgUrl?: string;
-  isRowReverse?: boolean;
+  background: string;
+  isTagline: string;
+  backgroundColor?: string;
+  textColor?: string;
 };
