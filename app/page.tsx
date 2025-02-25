@@ -8,6 +8,7 @@ import ContactType1 from "@components/Contact/_ContactType1";
 import CallToActionType1 from "@components/CallToAction/_CallToActionType1";
 import MainContentType1 from "@components/MainContent/_MainContentType1";
 import { createClient } from "../supabase/client";
+import TextBoxType from "@components/TextBox/_TextBox";
 
 const supabase = createClient();
 
@@ -18,6 +19,8 @@ const BuilderPage: React.FC = () => {
   const projectId = searchParams.get("projectId");  // this format in url ' localhost:4000/?projectId=195c502b-81ca-4f56-8442-aa9659f4baef '
 
   const [sections, setSections] = useState<JSX.Element[]>([]);
+  const [footer, setFooter] = useState<JSX.Element[]>([]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,6 +91,8 @@ const BuilderPage: React.FC = () => {
           : {};
         console.log(parsedFooterData)
 
+        setFooter([<FooterType1 key={"footer"} data={parsedFooterData}/>])
+
         console.log("Header Data:", JSON.stringify(parsedHeaderData, null, 2));
         console.log("Footer Data:", JSON.stringify(parsedFooterData, null, 2));
 
@@ -104,6 +109,8 @@ const BuilderPage: React.FC = () => {
     fetchData();
   }, [projectId]);
 
+  
+
   const renderSection = (layer: { content: string; componentType: string }) => {
     try {
       const layerContent = JSON.parse(layer.content);
@@ -112,15 +119,13 @@ const BuilderPage: React.FC = () => {
         case "Header":
           return <HeaderType1 key={layer.componentType} data={layerContent} />;
         case "MainContent":
-          return (
-            <MainContentType1 key={layer.componentType} data={layerContent} />
-          );
+          return <MainContentType1 key={layer.componentType} data={layerContent} />
         case "CallToAction":
-          return (
-            <CallToActionType1 key={layer.componentType} data={layerContent} />
-          );
+          return <CallToActionType1 key={layer.componentType} data={layerContent} />
         case "Contact":
           return <ContactType1 key={layer.componentType} data={layerContent} />;
+        case "TextBox": 
+          return <TextBoxType key={layer.componentType} data={layerContent}/>;
         default:
           return null;
       }
@@ -133,7 +138,9 @@ const BuilderPage: React.FC = () => {
     }
   };
 
-  return <><div className="h-full w-full">{sections} </div></> ;
+  return <>
+  <div className="h-full w-full">{sections}{footer}</div>
+  </> ;
 };
 
 export default BuilderPage;
