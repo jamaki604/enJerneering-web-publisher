@@ -25,7 +25,6 @@ const ContactType2: React.FC<ContactProps> = ({ data }) => {
             </h2>
             <p className="text-base text-neutral-500">{subtitle}</p>
           </div>
-
           <FormContact primaryLabel={primaryLabel} isShowName={false} />
         </div>
       </div>

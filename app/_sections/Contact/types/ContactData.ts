@@ -17,4 +17,5 @@ export type ContactData = {
   phoneField: boolean;
   messageField: boolean;
   textColor: string;
+  primaryLabel?: string;
 };

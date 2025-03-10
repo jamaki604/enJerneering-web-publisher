@@ -36,6 +36,8 @@ export const headerData: HeaderData = {
   imgUrl: "/img/cryo.jpeg",
   videoUrl: "/videos/laser-resurfacing.mp4",
   isRowReverse: false,
+    //added for successful Build
+  background: "linear-gradient(to right, #ff7e5f, #feb47b)",
 };
 
 //Navbar
@@ -157,7 +159,8 @@ export const mainContentData: MainContentData = {
   title: "Medium length hero heading goes here",
   subtitle:
     "Lorem ipsum dolor sit amet consectetur. Nunc tincidunt pretium ut duis rhoncus. Et pulvinar aliquam malesuada eu praesent ullamcorper quam quam. ",
-  tagLine: "enJerneering - Innovate Beyond",
+   //added for successful Build changed TagLine to isTagLine
+    isTagline: "enJerneering - Innovate Beyond",
   imgUrl: "/img/bg-contact.png",
   subHeading: [
     {
@@ -205,6 +208,8 @@ export const ctaData: HeaderData = {
   secondaryUrl: "/",
   imgUrl: "/img/bg-contact.png",
   isRowReverse: false,
+    //added for successful Build
+  background: "#f3f4f6",
 };
 
 // Team Section
@@ -343,6 +348,15 @@ export const contactData: ContactData = {
   primaryLabel: "Send message",
   imgUrl: "/img/bg-contact.png",
   mapSrc: mapSrc,
+  //added for successful Build
+  contactPhone: true,  
+  contactEmail: true,  
+  contactAddress: true, 
+  nameField: true, 
+  emailField: true, 
+  phoneField: true, 
+  messageField: true, 
+  textColor: "#000000"
 };
 
 // Servives
@@ -407,6 +421,8 @@ export const blogData: BlogData = {
         avatarUrl: "/img/team.png",
         href: "/",
       },
+        //added for successful Build
+      type: 1
     },
     {
       title: "Blog title heading goes here",
@@ -422,6 +438,8 @@ export const blogData: BlogData = {
         avatarUrl: "/img/team.png",
         href: "/",
       },
+        //added for successful Build
+      type: 2
     },
     {
       title: "Blog title heading goes here",
@@ -437,6 +455,8 @@ export const blogData: BlogData = {
         avatarUrl: "/img/team.png",
         href: "/",
       },
+        //added for successful Build
+      type: 3
     },
   ],
   isShowAuthor: true,
@@ -445,7 +465,8 @@ export const blogData: BlogData = {
 // Textbox
 export const textBoxType = 1;
 export const textBoxData: TextBoxData = {
-  content: "This is Placeholder Text (Testing)"
+  content: "This is Placeholder Text (Testing)",
+  textColor: "#333"
 };
 
 // Footer

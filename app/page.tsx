@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import React, { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import FooterType1 from "@components/Footer/_FooterType1";
 import HeaderType1 from "@components/Header/_HeaderType1";
 import ContactType1 from "@components/Contact/_ContactType1";
@@ -10,75 +10,72 @@ import MainContentType1 from "@components/MainContent/_MainContentType1";
 import { createClient } from "../supabase/client";
 import TextBoxType from "@components/TextBox/_TextBox";
 
+export const dynamic = "force-dynamic";
+
 const supabase = createClient();
 
-
 const BuilderPage: React.FC = () => {
-
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get("projectId");  // this format in url ' localhost:4000/?projectId=195c502b-81ca-4f56-8442-aa9659f4baef '
-
+  const [projectId, setProjectId] = useState<string | null>(null);
   const [sections, setSections] = useState<JSX.Element[]>([]);
   const [footer, setFooter] = useState<JSX.Element[]>([]);
 
+  const SearchParamsWrapper: React.FC = () => {
+    const searchParams = useSearchParams();
+    const id = searchParams.get("projectId");
+    useEffect(() => {
+      setProjectId(id);
+    }, [id]);
+
+    return null;
+  };
 
   useEffect(() => {
+    if (!projectId) {
+      console.warn("No projectId found in URL.");
+      return;
+    }
+
     const fetchData = async () => {
-      console.log(`Received request for debug: ${projectId}`);
+      console.log(`Fetching data for projectId: ${projectId}`);
 
       try {
-        // Fetch web elements
         const { data: webElementsData, error: webElementsErr } = await supabase
           .from("web-elements")
           .select("*")
-          .eq("projectId", projectId ?? "")
+          .eq("projectId", projectId)
           .single();
 
-        if (webElementsErr) {
-          throw new Error(`WebElements error: ${webElementsErr.message}`);
-        }
+        if (webElementsErr) throw new Error(`WebElements error: ${webElementsErr.message}`);
 
-        // Fetch design data
         const { data: designData, error: designErr } = await supabase
           .from("designs")
           .select("*")
-          .eq("projectId", projectId ?? "");
+          .eq("projectId", projectId);
 
-        if (designErr) {
-          throw new Error(`Designs error: ${designErr.message}`);
-        }
+        if (designErr) throw new Error(`Designs error: ${designErr.message}`);
 
         let designId = designData?.[designData.length - 1]?.designId;
 
-        // Fetch pages data
         const { data: pagesData, error: pagesErr } = await supabase
           .from("pages")
           .select("*")
           .eq("designId", designId);
 
-        if (pagesErr) {
-          throw new Error(`Pages error: ${pagesErr.message}`);
-        }
-
-        console.log("Pages Data", pagesData);
+        if (pagesErr) throw new Error(`Pages error: ${pagesErr.message}`);
 
         let pageId = pagesData?.find(
           (page) => page.pageTitle === "Landing Page",
         )?.pageId;
 
-        // Fetch layers data
         const { data: layerData, error: layerErr } = await supabase
           .from("layers")
           .select("*")
           .eq("pageId", pageId ?? "");
 
-        if (layerErr) {
-          throw new Error(`Layers error: ${layerErr.message}`);
-        }
+        if (layerErr) throw new Error(`Layers error: ${layerErr.message}`);
 
-        console.log("Layer Data: ", layerData);
+        console.log("Layer Data:", layerData);
 
-        // Extract header and footer data
         const headerLayer = layerData?.find(
           (layer) => layer.componentType === "Header",
         );
@@ -89,17 +86,16 @@ const BuilderPage: React.FC = () => {
         const parsedFooterData = webElementsData?.footerData
           ? JSON.parse(webElementsData.footerData)
           : {};
-        console.log(parsedFooterData)
 
-        setFooter([<FooterType1 key={"footer"} data={parsedFooterData}/>])
+        setFooter([<FooterType1 key={"footer"} data={parsedFooterData} />]);
 
-        console.log("Header Data:", JSON.stringify(parsedHeaderData, null, 2));
-        console.log("Footer Data:", JSON.stringify(parsedFooterData, null, 2));
+        console.log("Header Data:", parsedHeaderData);
+        console.log("Footer Data:", parsedFooterData);
 
-        // Render sections
         const renderedSections = (
           layerData?.map((layer) => renderSection(layer)) || []
         ).filter((section) => section !== null);
+
         setSections(renderedSections);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -109,8 +105,6 @@ const BuilderPage: React.FC = () => {
     fetchData();
   }, [projectId]);
 
-  
-
   const renderSection = (layer: { content: string; componentType: string }) => {
     try {
       const layerContent = JSON.parse(layer.content);
@@ -119,13 +113,13 @@ const BuilderPage: React.FC = () => {
         case "Header":
           return <HeaderType1 key={layer.componentType} data={layerContent} />;
         case "MainContent":
-          return <MainContentType1 key={layer.componentType} data={layerContent} />
+          return <MainContentType1 key={layer.componentType} data={layerContent} />;
         case "CallToAction":
-          return <CallToActionType1 key={layer.componentType} data={layerContent} />
+          return <CallToActionType1 key={layer.componentType} data={layerContent} />;
         case "Contact":
           return <ContactType1 key={layer.componentType} data={layerContent} />;
-        case "TextBox": 
-          return <TextBoxType key={layer.componentType} data={layerContent}/>;
+        case "TextBox":
+          return <TextBoxType key={layer.componentType} data={layerContent} />;
         default:
           return null;
       }
@@ -138,9 +132,15 @@ const BuilderPage: React.FC = () => {
     }
   };
 
-  return <>
-  <div className="h-full w-full">{sections}{footer}</div>
-  </> ;
+  return (
+    <>
+      <Suspense fallback={<div>Loading...</div>}>
+        <SearchParamsWrapper />
+      </Suspense>
+      
+      <div className="h-full w-full">{sections}{footer}</div>
+    </>
+  );
 };
 
 export default BuilderPage;

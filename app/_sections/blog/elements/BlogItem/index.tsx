@@ -3,7 +3,7 @@
 import React from "react";
 import BlogItemType1 from "./_BlogItemType1";
 import BlogItemType2 from "./_BlogItemType2";
-import { BlogItem, ViewOptions } from "../../types/BlogData";
+import type { BlogItem, ViewOptions } from "../../types/BlogData";
 
 interface BlogItemProps {
   type: number;

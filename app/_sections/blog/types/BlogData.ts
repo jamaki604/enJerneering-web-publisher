@@ -14,6 +14,7 @@ export type BlogItem = {
   timeRead: string;
   author: Author;
   href: string;
+  type: number;
 };
 
 export type Author = {
