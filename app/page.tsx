@@ -10,6 +10,7 @@ import MainContentType1 from "@components/MainContent/_MainContentType1";
 import { createClient } from "../supabase/client";
 import TextBoxType from "@components/TextBox/_TextBox";
 
+//added for successful build
 export const dynamic = "force-dynamic";
 
 const supabase = createClient();
@@ -18,14 +19,14 @@ const BuilderPage: React.FC = () => {
   const [projectId, setProjectId] = useState<string | null>(null);
   const [sections, setSections] = useState<JSX.Element[]>([]);
   const [footer, setFooter] = useState<JSX.Element[]>([]);
-
+  
+//added for successful build
   const SearchParamsWrapper: React.FC = () => {
     const searchParams = useSearchParams();
     const id = searchParams.get("projectId");
     useEffect(() => {
       setProjectId(id);
     }, [id]);
-
     return null;
   };
 
