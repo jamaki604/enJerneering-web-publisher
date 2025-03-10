@@ -7,7 +7,7 @@ import HeaderType1 from "@components/Header/_HeaderType1";
 import ContactType1 from "@components/Contact/_ContactType1";
 import CallToActionType1 from "@components/CallToAction/_CallToActionType1";
 import MainContentType1 from "@components/MainContent/_MainContentType1";
-import { createClient } from "../supabase/client";
+import { createClient } from "../../supabase/client";
 import TextBoxType from "@components/TextBox/_TextBox";
 
 //added for successful build

@@ -11,4 +11,5 @@ export type CallToActionData = {
   isTagline: string;
   backgroundColor?: string;
   textColor?: string;
+  isRowReverse?: false;
 };

@@ -4,22 +4,25 @@ import React from "react";
 import Button from "@/_sections/Button";
 
 interface FormContactProps {
-  requiredFields: {
+  requiredFields?: {
     nameField: boolean;
     emailField: boolean;
     phoneField: boolean;
     messageField: boolean;
   };
+  primaryLabel?: string;
+  isShowName?: boolean;
 }
 
 // Pierson - UPdate Form Contact to take the boolean values from checkboxes and display accordingly
 const FormContact: React.FC<FormContactProps> = ({ requiredFields }) => {
   const {
-    nameField,
-    emailField,
-    phoneField,
-    messageField
-  } = requiredFields;
+    nameField = false,
+    emailField = false,
+    phoneField = false,
+    messageField = false,
+  } = requiredFields || {}; // 👈 Ensure requiredFields is always an object
+  
   return (
     <form
       action="#"
