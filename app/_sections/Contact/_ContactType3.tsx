@@ -11,16 +11,27 @@ interface ContactProps {
   data: ContactData;
 }
 
+// Pierson - Update Contact Types
 const ContactType3: React.FC<ContactProps> = ({ data }) => {
   const {
-    title = "Default Title",
-    subtitle = "Default Subtitle",
-    phone = "+123456789",
-    mail = "contact@enjerneering.com",
-    address = "Default address",
-    primaryLabel = "Default label",
-    imgUrl = "default-image.jpg",
+    title,
+    subtitle,
+    phone,
+    mail,
+    address,
+    imgUrl,
+    contactPhone,
+    contactEmail,
+    contactAddress,
+    nameField,
+    emailField,
+    phoneField,
+    messageField,
+    textColor
   } = data;
+
+  // add requried fields to be passed through to FormContact
+const requiredFields = {nameField, emailField, phoneField, messageField, mail }
 
   return (
     <div className="relative isolate bg-gray-50">
@@ -75,7 +86,7 @@ const ContactType3: React.FC<ContactProps> = ({ data }) => {
           </div>
         </div>
         <div className="px-6 py-20 lg:p-20">
-          <FormContact primaryLabel={primaryLabel} isShowName />
+          <FormContact requiredFields={requiredFields} />
         </div>
       </div>
     </div>

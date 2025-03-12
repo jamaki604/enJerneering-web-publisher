@@ -2,7 +2,7 @@ export type ContactData = {
   title: string;
   subtitle: string;
   phone?: string;
-  mail?: string;
+  mail: string;
   address?: string;
   phoneLabel?: string;
   mailLabel?: string;

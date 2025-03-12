@@ -11,13 +11,27 @@ interface ContactProps {
   data: ContactData;
 }
 
+// Pierson - Update Contact Types
 const ContactType4: React.FC<ContactProps> = ({ data }) => {
   const {
-    title = "Default Title",
-    subtitle = "Default Subtitle",
-    primaryLabel = "Default label",
-    mapSrc = "default maps",
+    title,
+    subtitle,
+    phone,
+    mail,
+    address,
+    imgUrl,
+    contactPhone,
+    contactEmail,
+    contactAddress,
+    nameField,
+    emailField,
+    phoneField,
+    messageField,
+    textColor
   } = data;
+
+  // add requried fields to be passed through to FormContact
+const requiredFields = {nameField, emailField, phoneField, messageField, mail }
 
   return (
     <div className="bg-gray-50">
@@ -30,7 +44,7 @@ const ContactType4: React.FC<ContactProps> = ({ data }) => {
         </div>
         <div className="mx-auto w-full md:max-w-screen-xl lg:max-w-none grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
           <div>
-            <iframe
+            {/* <iframe
               src={mapSrc}
               width="656"
               height="436"
@@ -38,10 +52,10 @@ const ContactType4: React.FC<ContactProps> = ({ data }) => {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
+            ></iframe> */}
           </div>
           <div>
-            <FormContact primaryLabel={primaryLabel} isShowName={false} />
+            <FormContact requiredFields={requiredFields} />
           </div>
         </div>
       </div>

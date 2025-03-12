@@ -30,7 +30,7 @@ const ContactType1: React.FC<ContactProps> = ({ data }) => {
   } = data;
 
   // add requried fields to be passed through to FormContact
-const requiredFields = {nameField, emailField, phoneField, messageField }
+const requiredFields = {nameField, emailField, phoneField, messageField, mail }
 
 // Pierson - show passed data from forms, with text coloring and checkbox options actualy changing things 
   return (
