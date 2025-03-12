@@ -7,8 +7,27 @@ interface ContactProps {
   data: ContactData;
 }
 
+// Pierson - Update Contact Types
 const ContactType2: React.FC<ContactProps> = ({ data }) => {
-  const { title, subtitle, primaryLabel, imgUrl = "default-image.jpg" } = data;
+  const {
+    title,
+    subtitle,
+    phone,
+    mail,
+    address,
+    imgUrl,
+    contactPhone,
+    contactEmail,
+    contactAddress,
+    nameField,
+    emailField,
+    phoneField,
+    messageField,
+    textColor
+  } = data;
+
+  // add requried fields to be passed through to FormContact
+const requiredFields = {nameField, emailField, phoneField, messageField, mail }
 
   return (
     <div className="bg-gray-50">
@@ -25,7 +44,7 @@ const ContactType2: React.FC<ContactProps> = ({ data }) => {
             </h2>
             <p className="text-base text-neutral-500">{subtitle}</p>
           </div>
-          <FormContact primaryLabel={primaryLabel} isShowName={false} />
+          <FormContact requiredFields={requiredFields} />
         </div>
       </div>
     </div>
