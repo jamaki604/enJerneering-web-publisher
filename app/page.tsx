@@ -1,150 +1,163 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import FooterType1 from "@components/Footer/_FooterType1";
-import HeaderType1 from "@components/Header/_HeaderType1";
-import ContactType1 from "@components/Contact/_ContactType1";
-import CallToActionType1 from "@components/CallToAction/_CallToActionType1";
-import MainContentType1 from "@components/MainContent/_MainContentType1";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "../supabase/client";
-import TextBoxType from "@components/TextBox/_TextBox";
-
-//added for successful build
-export const dynamic = "force-dynamic";
 
 const supabase = createClient();
 
-const BuilderPage: React.FC = () => {
-  const [projectId, setProjectId] = useState<string | null>(null);
-  const [sections, setSections] = useState<JSX.Element[]>([]);
-  const [footer, setFooter] = useState<JSX.Element[]>([]);
-  
-//added for successful build
-  const SearchParamsWrapper: React.FC = () => {
-    const searchParams = useSearchParams();
-    const id = searchParams.get("projectId");
-    useEffect(() => {
-      console.log("Extracted projectId from URL:", id);
-      setProjectId(id);
-    }, [id]);
-    return null;
-  };
+interface Project {
+  projectId: string;
+  projectTitle: string;
+}
+
+const DebugPage: React.FC = () => {
+  const [projectId, setProjectId] = useState("");
+  const [projectData, setProjectData] = useState<any | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [recentProjects, setRecentProjects] = useState<Project[]>([]);
+
+  const router = useRouter();
 
   useEffect(() => {
-    console.log("Checking projectId:", projectId);
-    
-    if (!projectId) {
-      console.warn("No projectId found in URL.");
+    const storedProjects = JSON.parse(localStorage.getItem("recentProjects") || "[]");
+    setRecentProjects(storedProjects);
+  }, []);
+
+  const handleNavigate = () => {
+    if (!projectId.trim()) {
+      setError("Please enter a valid Project ID.");
+      return;
+    }
+    fetchProjectTitleAndStore(projectId, true);
+    router.push(`/viewer?projectId=${projectId}`);
+  };
+
+  const fetchProjectData = async () => {
+    setError(null);
+    setProjectData(null);
+
+    if (!projectId.trim()) {
+      setError("Please enter a valid Project ID.");
       return;
     }
 
-    const fetchData = async () => {
-      console.log(`Fetching data for projectId: ${projectId}`);
+    const { data, error } = await supabase
+      .from("web-elements")
+      .select("*")
+      .eq("projectId", projectId)
+      .single();
 
-      try {
-        const { data: webElementsData, error: webElementsErr } = await supabase
-          .from("web-elements")
-          .select("*")
-          .eq("projectId", projectId)
-          .single();
+    if (error) {
+      setError("Failed to fetch data. Ensure the project ID exists.");
+      console.error(error);
+    } else {
+      fetchProjectTitleAndStore(projectId, false);
+      setProjectData(data);
+    }
+  };
 
-        if (webElementsErr) throw new Error(`WebElements error: ${webElementsErr.message}`);
+  const fetchProjectTitleAndStore = async (id: string, navigate: boolean) => {
+    console.log("🔍 Fetching project title for ID:", id);
 
-        const { data: designData, error: designErr } = await supabase
-          .from("designs")
-          .select("*")
-          .eq("projectId", projectId);
+    const { data, error } = await supabase
+      .from("projects") 
+      .select("projectTitle")
+      .eq("projectId", id)
+      .single();
 
-        if (designErr) throw new Error(`Designs error: ${designErr.message}`);
+    console.log("📡 Supabase Response:", data, error);
 
-        let designId = designData?.[designData.length - 1]?.designId;
+    if (!error && data?.projectTitle) {
+      console.log("✅ Found Project Title:", data.projectTitle);
+      
+      const newProject: Project = { projectId: id, projectTitle: data.projectTitle };
+      const updatedProjects = [newProject, ...recentProjects.filter((p) => p.projectId !== id)].slice(0, 5);
 
-        const { data: pagesData, error: pagesErr } = await supabase
-          .from("pages")
-          .select("*")
-          .eq("designId", designId);
+      setRecentProjects(updatedProjects);
+      localStorage.setItem("recentProjects", JSON.stringify(updatedProjects));
+    } else {
+      console.warn("⚠️ Project title not found. Storing without title.");
+      const newProject: Project = { projectId: id, projectTitle: "Unnamed Project" };
 
-        if (pagesErr) throw new Error(`Pages error: ${pagesErr.message}`);
-
-        let pageId = pagesData?.find(
-          (page) => page.pageTitle === "Landing Page",
-        )?.pageId;
-
-        const { data: layerData, error: layerErr } = await supabase
-          .from("layers")
-          .select("*")
-          .eq("pageId", pageId ?? "");
-
-        if (layerErr) throw new Error(`Layers error: ${layerErr.message}`);
-
-        console.log("Layer Data:", layerData);
-
-        const headerLayer = layerData?.find(
-          (layer) => layer.componentType === "Header",
-        );
-        const parsedHeaderData = headerLayer
-          ? JSON.parse(headerLayer.content)
-          : {};
-
-        const parsedFooterData = webElementsData?.footerData
-          ? JSON.parse(webElementsData.footerData)
-          : {};
-
-        setFooter([<FooterType1 key={"footer"} data={parsedFooterData} />]);
-
-        console.log("Header Data:", parsedHeaderData);
-        console.log("Footer Data:", parsedFooterData);
-
-        const renderedSections = (
-          layerData?.map((layer) => renderSection(layer)) || []
-        ).filter((section) => section !== null);
-
-        setSections(renderedSections);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, [projectId]);
-
-  const renderSection = (layer: { content: string; componentType: string }) => {
-    try {
-      const layerContent = JSON.parse(layer.content);
-
-      switch (layer.componentType) {
-        case "Header":
-          return <HeaderType1 key={layer.componentType} data={layerContent} />;
-        case "MainContent":
-          return <MainContentType1 key={layer.componentType} data={layerContent} />;
-        case "CallToAction":
-          return <CallToActionType1 key={layer.componentType} data={layerContent} />;
-        case "Contact":
-          return <ContactType1 key={layer.componentType} data={layerContent} />;
-        case "TextBox":
-          return <TextBoxType key={layer.componentType} data={layerContent} />;
-        default:
-          return null;
-      }
-    } catch (error) {
-      console.error(
-        `Error rendering section for ${layer.componentType}:`,
-        error,
-      );
-      return null;
+      const updatedProjects = [newProject, ...recentProjects.filter((p) => p.projectId !== id)].slice(0, 5);
+      setRecentProjects(updatedProjects);
+      localStorage.setItem("recentProjects", JSON.stringify(updatedProjects));
     }
   };
 
   return (
-    <>
-      <Suspense fallback={<div>Loading...</div>}>
-        <SearchParamsWrapper />
-      </Suspense>
-      
-      <div className="h-full w-full">{sections}{footer}</div>
-    </>
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-6">
+      <div className="max-w-2xl w-full bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+        
+        {/* Title Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-5xl font-extrabold text-gray-900">enJerneering UI Viewer</h1>
+          <h2 className="text-lg font-medium text-gray-600 mt-2">Debug Panel</h2>
+        </div>
+
+        <p className="text-gray-600 text-center mb-6">
+          Enter a <span className="font-semibold text-gray-800">Project ID</span> to navigate to the viewer or test the data.
+        </p>
+
+        {/* Input */}
+        <div className="flex flex-col items-center space-y-4">
+          <input
+            type="text"
+            value={projectId}
+            onChange={(e) => setProjectId(e.target.value)}
+            placeholder="Enter Project ID"
+            className="w-full rounded-lg border border-gray-400 bg-white px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          />
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          {/* Buttons with fixed width */}
+          <div className="flex space-x-4">
+            <button
+              onClick={handleNavigate}
+              className="w-48 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 rounded-lg transition duration-300"
+            >
+              Go to Viewer
+            </button>
+
+            <button
+              onClick={fetchProjectData}
+              className="w-48 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-3 rounded-lg transition duration-300"
+            >
+              Data Test
+            </button>
+          </div>
+        </div>
+
+        {/* Project Data Output */}
+        {projectData && (
+          <div className="mt-6 p-4 bg-white border border-gray-300 rounded-lg overflow-auto max-h-64">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">Project Data:</h2>
+            <pre className="text-sm text-gray-600 whitespace-pre-wrap">{JSON.stringify(projectData, null, 2)}</pre>
+          </div>
+        )}
+
+        {/* Recently Tested Projects */}
+        {recentProjects.length > 0 && (
+          <div className="mt-6 p-4 bg-gray-100 border border-gray-300 rounded-lg">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">Recently Tested Projects</h2>
+            <div className="space-y-2">
+              {recentProjects.map(({ projectId, projectTitle }) => (
+                <button
+                  key={projectId}
+                  onClick={() => setProjectId(projectId)}
+                  className="w-full bg-gray-300 hover:bg-gray-400 text-gray-900 font-medium py-2 rounded-lg transition duration-300"
+                >
+                  {projectTitle || "Unnamed Project"}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
-export default BuilderPage;
+export default DebugPage;

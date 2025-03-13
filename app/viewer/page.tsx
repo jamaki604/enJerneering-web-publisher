@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 const supabase = createClient();
 
-const BuilderPage: React.FC = () => {
+const ViewerPage: React.FC = () => {
   const [projectId, setProjectId] = useState<string | null>(null);
   const [sections, setSections] = useState<JSX.Element[]>([]);
   const [footer, setFooter] = useState<JSX.Element[]>([]);
@@ -147,4 +147,4 @@ const BuilderPage: React.FC = () => {
   );
 };
 
-export default BuilderPage;
+export default ViewerPage;
