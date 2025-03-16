@@ -30,7 +30,7 @@ const DebugPage: React.FC = () => {
       return;
     }
     fetchProjectTitleAndStore(projectId, true);
-    router.push(`/viewer?projectId=${projectId}`);
+    router.push(`/viewer/${projectId}`);
   };
 
   const fetchProjectData = async () => {
