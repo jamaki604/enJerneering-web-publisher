@@ -14,10 +14,7 @@ const HeaderType1: React.FC<HeaderProps> = ({ data }) => {
   const {
     title,
     subtitle,
-    primaryLabel,
-    secondaryLabel,
-    primaryUrl,
-    secondaryUrl,
+    buttons,
     imgUrl,
     background,
     backgroundColor,
@@ -26,6 +23,7 @@ const HeaderType1: React.FC<HeaderProps> = ({ data }) => {
 
 
   // Pierson - Add visuals for the Header data from forms
+  // Buttons now work in Header
   return (
     <div
           className={classNames(
@@ -58,12 +56,7 @@ const HeaderType1: React.FC<HeaderProps> = ({ data }) => {
               </h6>
             </div>
 
-            <ButtonActions
-              primaryLabel={primaryLabel}
-              secondaryLabel={secondaryLabel}
-              primaryUrl={primaryUrl}
-              secondaryUrl={secondaryUrl}
-            />
+            <ButtonActions buttons = {buttons}/>
           </div>
         </div>
     </div>
