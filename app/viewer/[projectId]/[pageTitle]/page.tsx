@@ -69,7 +69,8 @@ const PageViewer = () => {
         const { data: layerData, error: layerErr } = await supabase
           .from("layers")
           .select("*")
-          .eq("pageId", pageId ?? "");
+          .eq("pageId", pageId ?? "")
+          .order("index", { ascending: true });
 
         if (layerErr) throw new Error(`Layers error: ${layerErr.message}`);
 
