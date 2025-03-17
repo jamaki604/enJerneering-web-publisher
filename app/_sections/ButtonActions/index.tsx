@@ -16,17 +16,28 @@ const ButtonActions: React.FC<ButtonActionsProps> = ({ buttons }) => {
 
   return (
     <div className="flex items-center gap-4">
-      {buttons.map((button) => (
-        <Button
-          key={button.id}
-          label={button.buttonProps.label}
-          color={button.buttonProps.color}
-          iconLeft={button.buttonProps.icon ? <i className={button.buttonProps.icon}></i> : undefined}
-          onClick={() =>
-            handleRedirect(button.buttonProps.externalUrl || button.buttonProps.pagePath || "#")
+      {buttons.map((button) => {
+        const { actionType, externalUrl, pagePath, label, color, icon } = button.buttonProps;
+
+        const handleClick = () => {
+          if (actionType === "toExternal" && externalUrl) {
+            const formattedURL = externalUrl.startsWith("http") ? externalUrl : `https://${externalUrl}`;
+            handleRedirect(formattedURL, true);
+          } else if (actionType === "toPage" && pagePath) {
+            handleRedirect(pagePath, false);
           }
-        />
-      ))}
+        };
+
+        return (
+          <Button
+            key={button.id}
+            label={label}
+            color={color}
+            iconLeft={icon ? <i className={icon}></i> : undefined}
+            onClick={handleClick}
+          />
+        );
+      })}
     </div>
   );
 };
