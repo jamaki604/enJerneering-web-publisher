@@ -1,7 +1,5 @@
-export function windowOpen(url: string) {
-  if (typeof window !== "undefined") {
-    window.open(url, "_blank");
-  }
+export const windowOpen = (url: string, target: "_self" | "_blank" = "_self") => {
+  window.open(url, target);
 }
 
 export function classNames(...classes: any): string {

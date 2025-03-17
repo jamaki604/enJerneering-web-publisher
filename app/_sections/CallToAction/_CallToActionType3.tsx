@@ -16,12 +16,8 @@ const CallToActionType3: React.FC<CallToActionProps> = ({ data }) => {
     title = "Default Title",
     subtitle = "Default Subtitle",
     tagLine = "Default Tagline",
-    primaryLabel = "Primary Button",
-    secondaryLabel = "Secondary Button",
-    primaryUrl = "#",
-    secondaryUrl = "#",
+    buttons,
     imgUrl = "default-image.jpg",
-    isRowReverse = false,
   } = data;
 
   return (
@@ -29,7 +25,6 @@ const CallToActionType3: React.FC<CallToActionProps> = ({ data }) => {
       <div className="mx-auto max-w-[1440px] lg:flex lg:items-center lg:justify-between">
         <div
           className={classNames(
-            isRowReverse ? "lg:flex-row-reverse" : "",
             "md:grid md:grid-cols-2 min-h-[464px]"
           )}
         >
@@ -42,19 +37,13 @@ const CallToActionType3: React.FC<CallToActionProps> = ({ data }) => {
               <h6 className="leading-6 text-neutral-400">{subtitle}</h6>
             </div>
 
-            <ButtonActions
-              primaryLabel={primaryLabel}
-              secondaryLabel={secondaryLabel}
-              primaryUrl={primaryUrl}
-              secondaryUrl={secondaryUrl}
-            />
+            <ButtonActions buttons = {buttons}/>
           </div>
 
           <img
             alt="CTA Image"
             src={imgUrl}
             className={classNames(
-              isRowReverse ? "row-start-1" : "",
               "lg:absolute w-full lg:w-1/2 right-0 object-cover md:h-full order-1"
             )}
           />

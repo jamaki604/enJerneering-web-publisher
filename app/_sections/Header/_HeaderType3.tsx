@@ -13,23 +13,18 @@ interface HeaderProps {
 
 const HeaderType3: React.FC<HeaderProps> = ({ data }) => {
   const {
-    title = "Default Title",
-    subtitle = "Default Subtitle",
-    primaryLabel = "Primary Button",
-    secondaryLabel = "Secondary Button",
-    primaryUrl = "#",
-    secondaryUrl = "#",
-    tagLine = "Default Tagline",
-    imgUrl = "default-image.jpg",
+    title,
+    subtitle,
+    buttons,
+    tagLine,
+    imgUrl,
     videoUrl = "default-video.mp4",
-    isRowReverse = false,
   } = data;
 
   return (
     <div className="bg-gray-50">
       <div
         className={classNames(
-          isRowReverse ? "lg:flex-row-reverse" : "",
           "mx-auto max-w-[1440px] min-h-[624px] px-6 py-20 gap-10 lg:p-20 lg:flex lg:items-center lg:justify-between lg:gap-20"
         )}
       >
@@ -40,12 +35,7 @@ const HeaderType3: React.FC<HeaderProps> = ({ data }) => {
             <h6>{subtitle}</h6>
           </div>
 
-          <ButtonActions
-            primaryLabel={primaryLabel}
-            secondaryLabel={secondaryLabel}
-            primaryUrl={primaryUrl}
-            secondaryUrl={secondaryUrl}
-          />
+          <ButtonActions buttons = {buttons}/>
         </div>
         <div className="mx-auto max-w-screen-xl mt-10 lg:h-full lg:w-1/2 lg:mt-0">
           <ModalVideo

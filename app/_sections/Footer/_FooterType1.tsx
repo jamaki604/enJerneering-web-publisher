@@ -20,15 +20,10 @@ const FooterType1: React.FC<FooterProps> = ({ data }) => {
     showContentFlags,
   } = data;
 
-  const groupedNavigation: { [key: string]: Navigation[] } = {};
-
-  navigation.forEach((item) => {
-    const pageGroup = item.pageGroup || "Default";
-    if (!groupedNavigation[pageGroup]) {
-      groupedNavigation[pageGroup] = [];
-    }
-    groupedNavigation[pageGroup].push(item);
-  });
+  const columns = 3;
+  const splitNavigation = Array.from({ length: columns }, (_, i) =>
+    navigation.filter((_, index) => index % columns === i)
+  );
 
   return (
     <div className="z-30 bg-gray-50">
@@ -65,28 +60,21 @@ const FooterType1: React.FC<FooterProps> = ({ data }) => {
                 </div>
               )}
             </div>
-            <div className="w-full grid grid-cols-2 md:grid-cols-3 xl:col-span-3 gap-8">
-              {Object.entries(groupedNavigation).map(
-                ([pageGroup, navigation], index) => (
-                  <div key={index}>
-                    <h3 className="uppercase text-base font-semibold text-neutral-800">
-                      {pageGroup}
-                    </h3>
-                    <ul role="list" className="mt-6 space-y-4">
-                      {navigation.map((item, index) => (
-                        <li key={index}>
-                          <a
-                            href={item.href}
-                            className="text-base font-normal text-neutral-500 hover:text-neutral-800"
-                          >
-                            {item.title}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )
-              )}
+            <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-8">
+              {splitNavigation.map((column, colIndex) => (
+                <ul key={colIndex} role="list" className="space-y-4">
+                  {column.map((item, index) => (
+                    <li key={index}>
+                      <a
+                        href={item.href}
+                        className="text-base font-normal text-neutral-500 hover:text-neutral-800"
+                      >
+                        {item.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ))}
             </div>
             <div className="flex flex-shrink-0 gap-4 justify-center min-w-[200px] xl:flex-col xl:justify-start">
               {polices.map((item, index) => (

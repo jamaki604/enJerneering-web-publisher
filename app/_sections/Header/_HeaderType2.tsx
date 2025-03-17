@@ -11,12 +11,9 @@ interface HeaderProps {
 
 const HeaderType2: React.FC<HeaderProps> = ({ data }) => {
   const {
-    title = "Default Title",
-    subtitle = "Default Subtitle",
-    primaryLabel = "Primary Button",
-    secondaryLabel = "Secondary Button",
-    primaryUrl = "#",
-    secondaryUrl = "#",
+    title,
+    subtitle,
+    buttons,
     imgUrl = "default-image.jpg",
   } = data;
 
@@ -42,12 +39,7 @@ const HeaderType2: React.FC<HeaderProps> = ({ data }) => {
             <h6 className="text-white">{subtitle}</h6>
           </div>
 
-          <ButtonActions
-            primaryLabel={primaryLabel}
-            secondaryLabel={secondaryLabel}
-            primaryUrl={primaryUrl}
-            secondaryUrl={secondaryUrl}
-          />
+          <ButtonActions buttons = {buttons}/>
         </div>
       </div>
     </div>
