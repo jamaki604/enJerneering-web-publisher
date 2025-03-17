@@ -10,5 +10,4 @@ export type HeaderData = {
   backgroundColor?: string;
   textColor?: string;
   videoUrl?: string;
-  isRowReverse?: boolean;
 };

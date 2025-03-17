@@ -10,6 +10,7 @@ import { ServicesSectionData } from "../_sections/ServicesSection/types/Services
 import { BlogData } from "../_sections/blog/types/BlogData";
 import { v4 as uuidv4 } from "uuid";
 import { TextBoxData } from "./TextBox/types/TextBoxData";
+import { CallToActionData } from "./CallToAction/types/CallToActionData";
 
 // Search Engine Optimization
 export const seo: Metadata = {
@@ -28,15 +29,10 @@ export const headerType = 3;
 export const headerData: HeaderData = {
   title: "enJerneering UI Kit",
   subtitle: "A collection of React components for enJerneering projects",
-  primaryLabel: "Get Started",
-  secondaryLabel: "Live Demo",
+  buttons: [],
   tagLine: "enJerneering - Innovate Beyond",
-  primaryUrl: "/",
-  secondaryUrl: "/",
   imgUrl: "/img/cryo.jpeg",
   videoUrl: "/videos/laser-resurfacing.mp4",
-  isRowReverse: false,
-    //added for successful Build
   background: "linear-gradient(to right, #ff7e5f, #feb47b)",
 };
 
@@ -197,19 +193,14 @@ export const mainContentData: MainContentData = {
 
 // Call to action
 export const ctaType = 3;
-export const ctaData: HeaderData = {
+export const ctaData: CallToActionData = {
   title: "Medium length CTA goes here",
-  subtitle:
-    "Lorem ipsum dolor sit amet consectetur. Nunc tincidunt pretium ut duis rhoncus. Et pulvinar aliquam malesuada eu praesent quam quam.",
-  primaryLabel: "Get Started",
-  secondaryLabel: "Live Demo",
+  subtitle: "Lorem ipsum dolor sit amet consectetur. Nunc tincidunt pretium ut duis rhoncus. Et pulvinar aliquam malesuada eu praesent quam quam.",
+  buttons: [],
   tagLine: "enJerneering - Innovate Beyond",
-  primaryUrl: "/",
-  secondaryUrl: "/",
   imgUrl: "/img/bg-contact.png",
-  isRowReverse: false,
-    //added for successful Build
   background: "#f3f4f6",
+  isTagline: ""
 };
 
 // Team Section
@@ -466,7 +457,9 @@ export const blogData: BlogData = {
 export const textBoxType = 1;
 export const textBoxData: TextBoxData = {
   content: "This is Placeholder Text (Testing)",
-  textColor: "#333"
+  textColor: "#333",
+  fontSize: "",
+  isBold: false
 };
 
 // Footer

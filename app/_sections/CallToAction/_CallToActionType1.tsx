@@ -14,10 +14,7 @@ const CallToActionType1: React.FC<CallToActionProps> = ({ data }) => {
   const {
     title,
     subtitle,
-    primaryLabel,
-    secondaryLabel,
-    primaryUrl,
-    secondaryUrl,
+    buttons,
     tagLine,
     imgUrl,
     background,
@@ -65,12 +62,7 @@ const CallToActionType1: React.FC<CallToActionProps> = ({ data }) => {
             </h6>
           </div>
 
-          <ButtonActions
-            primaryLabel={primaryLabel}
-            secondaryLabel={secondaryLabel}
-            primaryUrl={primaryUrl}
-            secondaryUrl={secondaryUrl}
-          />
+          <ButtonActions buttons = {buttons}/>
         </div>
       </div>
     </div>

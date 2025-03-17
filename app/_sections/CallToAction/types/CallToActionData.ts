@@ -1,15 +1,13 @@
+import { ButtonSettingsData } from "@components/types";
+
 export type CallToActionData = {
   title: string;
   subtitle: string;
-  primaryLabel: string;
-  secondaryLabel: string;
+  buttons: ButtonSettingsData[];
   tagLine?: string;
-  primaryUrl: string;
-  secondaryUrl: string;
   imgUrl?: string;
   background: string;
   isTagline: string;
   backgroundColor?: string;
   textColor?: string;
-  isRowReverse?: false;
 };
