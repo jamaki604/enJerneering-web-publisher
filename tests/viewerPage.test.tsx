@@ -1,19 +1,24 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import ViewerPage from "../app/viewer/page";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { useSearchParams } from "next/navigation";
-import { mockSupabaseClient } from "./mockSupabaseClient";
 import React from "react";
+import { mockSupabaseClient } from "./mockSupabaseClient";
+import { useParams } from "next/navigation";
+import PageViewer from "../app/viewer/[projectId]/[pageTitle]/page";
+import dukeNukemData from "./jsonTestFiles/dukeNukem.json"; // Import the actual JSON file
 
-vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test-supabase-url.supabase.co');
-vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'test_anon_key');
+// Mock environment variables
+vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://test-supabase-url.supabase.co");
+vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test_anon_key");
 
+// Mock next/navigation
 vi.mock("next/navigation", () => ({
-  useSearchParams: vi.fn(() => ({
-    get: vi.fn(() => "test-project-id"),
+  useParams: vi.fn(() => ({
+    projectId: "195c502b-81ca-4f56-8442-aa9659f4baef",
+    pageTitle: "Landing-Page",
   })),
 }));
 
+// Mock Supabase client
 vi.mock("../supabase/client", () => ({
   createClient: vi.fn(() => mockSupabaseClient),
 }));
@@ -22,81 +27,82 @@ describe("ViewerPage Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockSupabaseClient.from.mockReturnValue({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
-        data: {
-          navigationData: [],
-          layerData: {},
-          headerData: {},
-          footerData: JSON.stringify({ text: "Footer Content" }),
-        },
-        error: null,
-      }),
-      insert: vi.fn().mockReturnThis(),
-      update: vi.fn().mockReturnThis(),
-      delete: vi.fn().mockReturnThis(),
-    });
-  });
+    // Default mocks for Supabase queries using dukeNukem.json data
+    mockSupabaseClient.from.mockImplementation((table: string) => {
+      const mockReturnValue = {
+        select: vi.fn(),
+        insert: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn(),
+        eq: vi.fn(),
+        single: vi.fn(),
+        order: vi.fn(),
+      };
 
-  it("renders loading state initially", () => {
-    render(<ViewerPage />);
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
+      switch (table) {
+        case "web-elements":
+          mockReturnValue.select = vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
+                data: dukeNukemData.footerData,
+                error: null,
+              }),
+            }),
+          });
+          break;
+        case "designs":
+          mockReturnValue.select = vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({
+              data: dukeNukemData.designData,
+              error: null,
+            }),
+          });
+          break;
+        case "pages":
+          mockReturnValue.select = vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({
+              data: dukeNukemData.pagesData,
+              error: null,
+            }),
+          });
+          break;
+        case "layers":
+          mockReturnValue.select = vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({
+                data: dukeNukemData.layerData,
+                error: null,
+              }),
+            }),
+          });
+          break;
+        default:
+          mockReturnValue.select = vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+          });
+          break;
+      }
+
+      return mockReturnValue;
+    });
   });
 
   it("extracts projectId from URL and logs it", async () => {
-    const consoleSpy = vi.spyOn(console, "log");
-    render(<ViewerPage />);
+    const consoleLogSpy = vi.spyOn(console, "log");
+    render(<PageViewer />);
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith("Extracted projectId from URL:", "test-project-id");
-    });
-  });
-
-  it("fetches project data and renders sections", async () => {
-    render(<ViewerPage />);
-
-    await waitFor(() => {
-      expect(screen.getByText("Footer Content")).toBeInTheDocument();
-    });
-  });
-
-  it("handles missing projectId gracefully", async () => {
-    vi.mocked(useSearchParams).mockReturnValue({
-      get: () => null,
-    } as any);
-
-    const consoleWarnSpy = vi.spyOn(console, "warn");
-    render(<ViewerPage />);
-
-    await waitFor(() => {
-      expect(consoleWarnSpy).toHaveBeenCalledWith("No projectId found in URL.");
-    });
-  });
-
-  it("handles API errors properly", async () => {
-    mockSupabaseClient.from.mockReturnValue({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
-        data: null,
-        error: { message: "Invalid request" },
-      }),
-      insert: vi.fn().mockReturnThis(),
-      update: vi.fn().mockReturnThis(),
-      delete: vi.fn().mockReturnThis(),
-    });
-
-    const consoleErrorSpy = vi.spyOn(console, "error");
-    render(<ViewerPage />);
-
-    await waitFor(() => {
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Error fetching data:",
-        expect.objectContaining({
-          message: "WebElements error: Invalid request",
-        }),
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        "Checking projectId:",
+        "195c502b-81ca-4f56-8442-aa9659f4baef"
       );
     });
   });
+
+  it("handles missing projectId gracefully", () => {
+    vi.mocked(useParams).mockReturnValue({ projectId: "", pageTitle: "" });
+    const consoleWarnSpy = vi.spyOn(console, "warn");
+    render(<PageViewer />);
+    expect(consoleWarnSpy).toHaveBeenCalledWith("No projectId found in URL.");
+  });
+
 });

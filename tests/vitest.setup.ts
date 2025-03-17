@@ -18,8 +18,10 @@ vi.mock("@supabase/supabase-js", async () => {
         insert: vi.fn().mockResolvedValue({ data: null, error: null }),
         update: vi.fn().mockResolvedValue({ data: null, error: null }),
         delete: vi.fn().mockResolvedValue({ data: null, error: null }),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: null, error: null }),
+        order: vi.fn().mockReturnThis(),
       }),
     })),
   };
 });
-

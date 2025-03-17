@@ -6,12 +6,10 @@ import Button from "@/_sections/Button";
 import { ButtonSettingsData } from "@components/types";
 
 interface ButtonActionsProps {
-  buttons: ButtonSettingsData[];
+  buttons?: ButtonSettingsData[]; // Made optional with '?'
 }
 
-//Pierson - Change button actions to work with button objects instead of just labels/urls
-
-const ButtonActions: React.FC<ButtonActionsProps> = ({ buttons }) => {
+const ButtonActions: React.FC<ButtonActionsProps> = ({ buttons = [] }) => {
   const { handleRedirect } = useRedirect();
 
   return (
