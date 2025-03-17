@@ -41,6 +41,9 @@
       "@internalSupabase/*": [
         "./supabase/*"
       ],
+      "@enums/*": [
+        "./app/_utils/enums/*"
+      ],
       "@/*": [
         "./app/*"
       ]
