@@ -14,10 +14,7 @@ const CallToActionType2: React.FC<CallToActionProps> = ({ data }) => {
     title = "Default Title",
     subtitle = "Default Subtitle",
     tagLine = "Default Tagline",
-    primaryLabel = "Primary Button",
-    secondaryLabel = "Secondary Button",
-    primaryUrl = "#",
-    secondaryUrl = "#",
+    buttons,
     imgUrl = "default-image.jpg",
   } = data;
 
@@ -45,12 +42,7 @@ const CallToActionType2: React.FC<CallToActionProps> = ({ data }) => {
             <h6 className="leading-6 text-neutral-400">{subtitle}</h6>
           </div>
 
-          <ButtonActions
-            primaryLabel={primaryLabel}
-            secondaryLabel={secondaryLabel}
-            primaryUrl={primaryUrl}
-            secondaryUrl={secondaryUrl}
-          />
+          <ButtonActions buttons = {buttons}/>
         </div>
       </div>
     </div>

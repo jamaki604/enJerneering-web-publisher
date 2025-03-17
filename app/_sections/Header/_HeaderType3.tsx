@@ -19,14 +19,12 @@ const HeaderType3: React.FC<HeaderProps> = ({ data }) => {
     tagLine,
     imgUrl,
     videoUrl = "default-video.mp4",
-    isRowReverse = false,
   } = data;
 
   return (
     <div className="bg-gray-50">
       <div
         className={classNames(
-          true ? "lg:flex-row-reverse" : "",
           "mx-auto max-w-[1440px] min-h-[624px] px-6 py-20 gap-10 lg:p-20 lg:flex lg:items-center lg:justify-between lg:gap-20"
         )}
       >
