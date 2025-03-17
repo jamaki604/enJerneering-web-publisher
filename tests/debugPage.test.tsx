@@ -28,6 +28,7 @@ describe("DebugPage Component", () => {
   let routerMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
+    vi.clearAllMocks();
     routerMock = vi.fn();
 
     (useRouter as unknown as jest.Mock).mockReturnValue({
@@ -55,11 +56,15 @@ describe("DebugPage Component", () => {
     expect(input.value).toBe("123456");
   });
 
-  it("shows an error message when trying to navigate without a projectId", () => {
+  it("shows an error message when trying to navigate without a projectId", async () => {
     render(<DebugPage />);
-    fireEvent.click(screen.getByText("Go to Viewer"));
+    await act(async () => {
+      fireEvent.click(screen.getByText("Go to Viewer"));
+    });
 
-    expect(screen.getByText("Please enter a valid Project ID.")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Please enter a valid Project ID.")).toBeInTheDocument();
+    });
   });
 
   it("navigates to the viewer page when a valid projectId is provided", async () => {
@@ -72,7 +77,9 @@ describe("DebugPage Component", () => {
       fireEvent.click(screen.getByText("Go to Viewer"));
     });
 
-    expect(routerMock).toHaveBeenCalledWith("/viewer?projectId=test-project-id");
+    await waitFor(() => {
+      expect(routerMock).toHaveBeenCalledWith("/viewer/test-project-id");
+    });
   });
 
   it("fetches project data and displays it", async () => {
@@ -88,7 +95,7 @@ describe("DebugPage Component", () => {
     await waitFor(() => {
       const matches = screen.getAllByText((content) => content.includes("Test Project"));
       expect(matches.length).toBeGreaterThan(0);
-    });    
+    });
   });
 
   it("stores and displays recently tested projects from local storage", () => {

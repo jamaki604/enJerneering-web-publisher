@@ -29,8 +29,10 @@ export default defineConfig({
       provider: "istanbul",
       reporter: ["text", "html"],
       include: [
-        "app/debug/page.tsx",
-        "app/viewer/page.tsx"
+        "app/page.tsx",
+        "app/viewer/page.tsx",
+        "app/viewer/%5BprojectId%5D/%5BpageTitle%5D/page.tsx",
+        "app/viewer/%5BprojectId%5D/page.tsx",
       ],
       exclude: [
         "node_modules/**",

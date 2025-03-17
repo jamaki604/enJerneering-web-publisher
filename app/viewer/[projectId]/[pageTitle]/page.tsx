@@ -125,10 +125,12 @@ const PageViewer = () => {
   };
 
   return (
-    <>
-      <Suspense fallback={<div>Loading...</div>}/>      
-      <div className="h-full w-full">{sections}{footer}</div>
-    </>
+    <Suspense fallback={<div>Loading...</div>}>
+      <div data-testid="viewer-container" className="h-full w-full">
+        {sections}
+        {footer}
+      </div>
+    </Suspense>
   );
 };
 
