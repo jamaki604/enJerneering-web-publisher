@@ -78,25 +78,25 @@ const PageViewer = () => {
           .eq("pageId", pageId ?? "")
 
         if (layerErr) throw new Error(`Layers error: ${layerErr.message}`);
-
-        layerData.sort((a,b) => {
-          let aConfiguration: LayerConfiguration = {
-            index: 0
-          }
-          let bConfiguration: LayerConfiguration = {
-            index: 0
-          }
-          aConfiguration = JSON.parse(a.configuration)
-          bConfiguration = JSON.parse(b.configuration)
-
-          if (aConfiguration.index < bConfiguration.index){
-            return -1;
-          }
-          if (aConfiguration.index > bConfiguration.index){
-            return 1;
-          }
-          return 0;
-        });
+        
+        if (layerData) {
+          layerData.sort((a, b) => {
+            if (!a.configuration || !b.configuration) return 0;
+        
+            try {
+              const aConfig = JSON.parse(a.configuration);
+              const bConfig = JSON.parse(b.configuration);
+        
+              const aIndex = typeof aConfig.index === "number" ? aConfig.index : 0;
+              const bIndex = typeof bConfig.index === "number" ? bConfig.index : 0;
+        
+              return aIndex - bIndex;
+            } catch (error) {
+              console.error("Error parsing configuration:", error);
+              return 0; 
+            }
+          });
+        }
 
         console.log("Layer Data:", layerData);
 
