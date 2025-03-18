@@ -4,7 +4,7 @@ import React from "react";
 import { mockSupabaseClient } from "./mockSupabaseClient";
 import { useParams } from "next/navigation";
 import PageViewer from "../app/viewer/[projectId]/[pageTitle]/page";
-import dukeNukemData from "./jsonTestFiles/dukeNukem.json"; // Import the actual JSON file
+import dukeNukemData from "./jsonTestFiles/dukeNukem.json"; 
 
 // Mock environment variables
 vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://test-supabase-url.supabase.co");
@@ -104,5 +104,7 @@ describe("ViewerPage Component", () => {
     render(<PageViewer />);
     expect(consoleWarnSpy).toHaveBeenCalledWith("No projectId found in URL.");
   });
+
+  
 
 });
