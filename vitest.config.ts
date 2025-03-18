@@ -31,8 +31,11 @@ export default defineConfig({
       include: [
         "app/page.tsx",
         "app/viewer/page.tsx",
-        "app/viewer/%5BprojectId%5D/%5BpageTitle%5D/page.tsx",
-        "app/viewer/%5BprojectId%5D/page.tsx",
+        "app/viewer/**/page.tsx",
+        "app/viewer/[projectId]/[pageTitle]/page.tsx",
+        "app/viewer/[projectId]/page.tsx",
+        "app/viewer/*/page.tsx", 
+        "app/viewer/*/*/page.tsx",
       ],
       exclude: [
         "node_modules/**",
