@@ -1,7 +1,10 @@
+import React from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@internalSupabase/client";
 
 export const dynamic = "force-dynamic";
+
+console.log("✅ Executing");
 
 const supabase = createClient();
 
@@ -32,12 +35,14 @@ const ProjectRedirectPage = async ({ params }: { params: { projectId: string } }
     return <p>No pages found for this project.</p>;
   }
 
-  const firstPageTitle = pagesData[0].pageTitle;
-  const firstPageParsed = firstPageTitle.replace(" ", "-");
+  const firstPageTitle = pagesData[0]?.pageTitle;
+
 
   if (!firstPageTitle) {
     return <p>First page not found.</p>;
   }
+
+  const firstPageParsed = firstPageTitle.replace(" ", "-");
 
   redirect(`/viewer/${projectId}/${firstPageParsed}`);
 };
