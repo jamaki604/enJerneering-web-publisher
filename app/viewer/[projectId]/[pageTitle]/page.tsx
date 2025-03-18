@@ -13,6 +13,8 @@ import TextBoxType from "@components/TextBox/_TextBox";
 //added for successful build
 export const dynamic = "force-dynamic";
 
+console.log("✅ Executing");
+
 const supabase = createClient();
 
 const PageViewer = () => {
