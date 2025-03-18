@@ -1,5 +1,6 @@
 import { TextBoxData } from "./types/TextBoxData";
 import TextBoxType from "./_TextBox";
+import React from "react";
 
 interface TextBoxProps {
     type: number;
