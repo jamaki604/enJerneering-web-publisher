@@ -15,6 +15,10 @@ export const dynamic = "force-dynamic";
 
 const supabase = createClient();
 
+type LayerConfiguration = {
+  index: number;
+}
+
 const PageViewer = () => {
     const { projectId, pageTitle } = useParams() as { projectId: string; pageTitle: string };;
     const [sections, setSections] = useState<JSX.Element[]>([]);
@@ -70,9 +74,27 @@ const PageViewer = () => {
           .from("layers")
           .select("*")
           .eq("pageId", pageId ?? "")
-          .order("index", { ascending: true });
 
         if (layerErr) throw new Error(`Layers error: ${layerErr.message}`);
+
+        layerData.sort((a,b) => {
+          let aConfiguration: LayerConfiguration = {
+            index: 0
+          }
+          let bConfiguration: LayerConfiguration = {
+            index: 0
+          }
+          aConfiguration = JSON.parse(a.configuration)
+          bConfiguration = JSON.parse(b.configuration)
+
+          if (aConfiguration.index < bConfiguration.index){
+            return -1;
+          }
+          if (aConfiguration.index > bConfiguration.index){
+            return 1;
+          }
+          return 0;
+        });
 
         console.log("Layer Data:", layerData);
 
