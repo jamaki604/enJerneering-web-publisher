@@ -2,9 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "../supabase/client";
-
-const supabase = createClient();
 
 interface Project {
   projectId: string;
@@ -24,13 +21,30 @@ const DebugPage: React.FC = () => {
     setRecentProjects(storedProjects);
   }, []);
 
-  const handleNavigate = () => {
+  const handleNavigate = async () => {
     if (!projectId.trim()) {
-      setError("Please enter a valid Project ID.");
+      setError("Please enter a valid JSON filename.");
       return;
     }
-    fetchProjectTitleAndStore(projectId, true);
-    router.push(`/viewer/${projectId}`);
+
+    try {
+      const filename = projectId.endsWith(".json") ? projectId : `${projectId}.json`;
+      const res = await fetch(`/${filename}`);
+      if (!res.ok) throw new Error("Failed to fetch file");
+
+      const data = await res.json();
+      const internalProjectId = data.projectData?.projectId;
+
+      if (!internalProjectId) {
+        throw new Error("No projectId found inside the JSON file.");
+      }
+
+      fetchProjectFileAndStore(internalProjectId, filename);
+      router.push(`/viewer/${internalProjectId}`);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load or parse JSON. Make sure it contains projectData.projectId.");
+    }
   };
 
   const fetchProjectData = async () => {
@@ -38,58 +52,48 @@ const DebugPage: React.FC = () => {
     setProjectData(null);
 
     if (!projectId.trim()) {
-      setError("Please enter a valid Project ID.");
+      setError("Please enter a valid JSON filename.");
       return;
     }
 
-    const { data, error } = await supabase
-      .from("web-elements")
-      .select("*")
-      .eq("projectId", projectId)
-      .single();
+    try {
+      const filename = projectId.endsWith(".json") ? projectId : `${projectId}.json`;
+      const res = await fetch(`/${filename}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch /${filename}`);
+      }
 
-    if (error) {
-      setError("Failed to fetch data. Ensure the project ID exists.");
-      console.error(error);
-    } else {
-      fetchProjectTitleAndStore(projectId, false);
+      const data = await res.json();
+      const internalProjectId = data.projectData?.projectId || "Unknown";
+
+      fetchProjectFileAndStore(internalProjectId, filename);
       setProjectData(data);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load JSON. Make sure the file exists and is correctly formatted.");
     }
   };
 
-  const fetchProjectTitleAndStore = async (id: string, navigate: boolean) => {
-    console.log("🔍 Fetching project title for ID:", id);
+  const fetchProjectFileAndStore = (internalId: string, filename: string) => {
+    const cleanedName = filename.replace(".json", "");
+    const newProject: Project = {
+      projectId: internalId,
+      projectTitle: cleanedName,
+    };
 
-    const { data, error } = await supabase
-      .from("projects") 
-      .select("projectTitle")
-      .eq("projectId", id)
-      .single();
+    const updatedProjects = [
+      newProject,
+      ...recentProjects.filter((p) => p.projectId !== internalId),
+    ].slice(0, 5);
 
-    console.log("📡 Supabase Response:", data, error);
-
-    if (!error && data?.projectTitle) {
-      console.log("✅ Found Project Title:", data.projectTitle);
-      
-      const newProject: Project = { projectId: id, projectTitle: data.projectTitle };
-      const updatedProjects = [newProject, ...recentProjects.filter((p) => p.projectId !== id)].slice(0, 5);
-
-      setRecentProjects(updatedProjects);
-      localStorage.setItem("recentProjects", JSON.stringify(updatedProjects));
-    } else {
-      console.warn("⚠️ Project title not found. Storing without title.");
-      const newProject: Project = { projectId: id, projectTitle: "Unnamed Project" };
-
-      const updatedProjects = [newProject, ...recentProjects.filter((p) => p.projectId !== id)].slice(0, 5);
-      setRecentProjects(updatedProjects);
-      localStorage.setItem("recentProjects", JSON.stringify(updatedProjects));
-    }
+    setRecentProjects(updatedProjects);
+    localStorage.setItem("recentProjects", JSON.stringify(updatedProjects));
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 px-6">
       <div className="max-w-2xl w-full bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-        
+
         {/* Title Section */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-extrabold text-gray-900">enJerneering UI Viewer</h1>
@@ -97,7 +101,7 @@ const DebugPage: React.FC = () => {
         </div>
 
         <p className="text-gray-600 text-center mb-6">
-          Enter a <span className="font-semibold text-gray-800">Project ID</span> to navigate to the viewer or test the data.
+          Enter the name of your <span className="font-semibold text-gray-800">local JSON file</span> to navigate or test it. Example: <code>data.json</code>
         </p>
 
         {/* Input */}
@@ -106,7 +110,7 @@ const DebugPage: React.FC = () => {
             type="text"
             value={projectId}
             onChange={(e) => setProjectId(e.target.value)}
-            placeholder="Enter Project ID"
+            placeholder="Enter JSON file name (e.g. data.json)"
             className="w-full rounded-lg border border-gray-400 bg-white px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-500"
           />
 
@@ -146,10 +150,10 @@ const DebugPage: React.FC = () => {
               {recentProjects.map(({ projectId, projectTitle }) => (
                 <button
                   key={projectId}
-                  onClick={() => setProjectId(projectId)}
+                  onClick={() => setProjectId(`${projectTitle}.json`)}
                   className="w-full bg-gray-300 hover:bg-gray-400 text-gray-900 font-medium py-2 rounded-lg transition duration-300"
                 >
-                  {projectTitle || "Unnamed Project"}
+                  {projectTitle}
                 </button>
               ))}
             </div>

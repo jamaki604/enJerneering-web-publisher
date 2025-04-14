@@ -1,50 +1,45 @@
-import React from "react";
 import { redirect } from "next/navigation";
-import { createClient } from "@internalSupabase/client";
+import { headers } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
-console.log("✅ Executing");
+type PageData = {
+  pageId: string;
+  pageTitle: string;
+  designId: string;
+};
 
-const supabase = createClient();
+type DesignData = {
+  designId: string;
+  projectId: string;
+};
 
 const ProjectRedirectPage = async ({ params }: { params: { projectId: string } }) => {
-  const { projectId } = params;
+  const host = headers().get("host");
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+  const url = `${protocol}://${host}/data.json`;
 
-  if (!projectId) {
-    return <p>Project ID is missing.</p>;
+  const res = await fetch(url, {
+    cache: "no-store",
+  });
+
+  const viewerData = await res.json();
+
+  const design = viewerData.designData?.find(
+    (d: DesignData) => d.projectId === params.projectId
+  );
+
+  const page = viewerData.pagesData?.find(
+    (p: PageData) => p.designId === design?.designId
+  );
+
+  if (!page?.pageTitle) {
+    return <p>No pages found in data.json</p>;
   }
 
-  const { data: designData, error: designErr } = await supabase
-    .from("designs")
-    .select("*")
-    .eq("projectId", projectId);
+  const firstPageParsed = page.pageTitle.replace(" ", "-");
 
-  if (designErr || !designData || designData.length === 0) {
-    return <p>Error fetching design data or no design found.</p>;
-  }
-
-  let designId = designData[designData.length - 1]?.designId;
-
-  const { data: pagesData, error: pagesErr } = await supabase
-    .from("pages")
-    .select("*")
-    .eq("designId", designId);
-
-  if (pagesErr || !pagesData || pagesData.length === 0) {
-    return <p>No pages found for this project.</p>;
-  }
-
-  const firstPageTitle = pagesData[0]?.pageTitle;
-
-
-  if (!firstPageTitle) {
-    return <p>First page not found.</p>;
-  }
-
-  const firstPageParsed = firstPageTitle.replace(" ", "-");
-
-  redirect(`/viewer/${projectId}/${firstPageParsed}`);
+  redirect(`/viewer/${params.projectId}/${firstPageParsed}`);
 };
 
 export default ProjectRedirectPage;
