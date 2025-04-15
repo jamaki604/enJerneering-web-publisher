@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { redirect } from "next/navigation";
 import { render, screen, waitFor } from "@testing-library/react";
-import ProjectRedirectPage from "../app/viewer/[projectId]/page";
+import ProjectRedirectPage from "../app/page";
 
 // ✅ Mock redirect to track calls
 vi.mock("next/navigation", () => ({

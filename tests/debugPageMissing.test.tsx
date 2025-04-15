@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import DebugPage from "../app/page";
+import DebugPage from "../app/debug/page";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useRouter } from "next/navigation";
 import React from "react";

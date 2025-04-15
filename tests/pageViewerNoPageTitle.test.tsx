@@ -3,7 +3,7 @@ import { render, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { useParams } from "next/navigation";
 import { mockSupabaseClient } from "./mockSupabaseClient";
-import PageViewer from "../app/viewer/[projectId]/[pageTitle]/page";
+import PageViewer from "../app/[pageTitle]/page";
 
 // Mock Supabase client
 vi.mock("../supabase/client", () => ({

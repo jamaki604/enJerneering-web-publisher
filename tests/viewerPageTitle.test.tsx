@@ -3,7 +3,7 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import React from "react";
 import { mockSupabaseClient } from "./mockSupabaseClient";
 import { useParams } from "next/navigation";
-import PageViewer from "../app/viewer/[projectId]/[pageTitle]/page";
+import PageViewer from "../app/[pageTitle]/page";
 import dukeNukemData from "./jsonTestFiles/dukeNukem.json"; 
 
 // Mock environment variables
