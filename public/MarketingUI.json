@@ -1,0 +1,45 @@
+{
+  "projectData": {
+    "projectId": "1",
+    "userId": "6b9e3b7b-3b1b-4b3b-8b7b-9e3b1b4b3b8b",
+    "projectTitle": "Marketing UI",
+    "projectDescription": "A sleek user interface for marketing applications.",
+    "projectDomain": "marketing",
+    "projectKeywords": [
+      "UI",
+      "marketing",
+      "design"
+    ],
+    "projectConfigurationDetails": "Configurations specific to marketing requirements.",
+    "projectThumbnail": "/img/demo-project-cover.png",
+    "projectUrl": "http://example.com/marketing-ui",
+    "projectStatus": "PUBLISHED",
+    "projectServiceAreas": [
+      "North America",
+      "Europe"
+    ],
+    "projectSeoTitle": "Effective UI for Marketing",
+    "projectSeoDescription": "Discover effective user interfaces for marketing applications.",
+    "projectSeoKeywords": [
+      "effective",
+      "user interface",
+      "marketing"
+    ],
+    "projectSeoImage": "/img/demo-project-cover.png",
+    "projectLanguage": "en",
+    "projectRegion": "Global",
+    "projectPrimaryColor": "#42b983",
+    "projectFontFamily": "Helvetica, Arial, sans-serif",
+    "projectRepositoryUrl": null,
+    "projectDeploymentUrl": null,
+    "lastUpdated": "2024-03-18T14:37:48.681",
+    "createdAt": "2024-03-18T14:00:00",
+    "affiliateClientOwnerId": null,
+    "affiliateOwnerId": null
+  },
+  "serviceData": [],
+  "footerData": {},
+  "designData": [],
+  "pagesData": [],
+  "layerData": []
+}
