@@ -8,6 +8,10 @@ import ContactType1 from "@components/Contact/_ContactType1";
 import CallToActionType1 from "@components/CallToAction/_CallToActionType1";
 import MainContentType1 from "@components/MainContent/_MainContentType1";
 import TextBoxType from "@components/TextBox/_TextBox";
+import Header from "@components/Header";
+import CallToAction from "@components/CallToAction";
+import Contact from "@components/Contact";
+import MainContent from "@components/MainContent";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +23,7 @@ type PageData = {
 
 type LayerData = {
   content: string;
+  styleVariant: number;
   componentType: string;
   configuration: string;
   pageId: string;
@@ -69,22 +74,23 @@ const PageViewer = () => {
   }, [parsedPageTitle]);
 
   const renderSection = (layer: LayerData) => {
-    try {
-      const content = JSON.parse(layer.content);
-      switch (layer.componentType) {
-        case "Header":
-          return <HeaderType1 key={layer.componentType} data={content} />;
-        case "MainContent":
-          return <MainContentType1 key={layer.componentType} data={content} />;
-        case "CallToAction":
-          return <CallToActionType1 key={layer.componentType} data={content} />;
-        case "Contact":
-          return <ContactType1 key={layer.componentType} data={content} />;
-        case "TextBox":
-          return <TextBoxType key={layer.componentType} data={content} />;
-        default:
-          return null;
-      }
+      try {
+        const layerContent = JSON.parse(layer.content);
+  
+        switch (layer.componentType) {
+          case "Header":
+            return <Header type={layer.styleVariant} data={layerContent} />;
+          case "MainContent":
+            return <MainContent type={layer.styleVariant} data={layerContent} />;
+          case "CallToAction":
+            return <CallToAction type={layer.styleVariant} data={layerContent} />;
+          case "Contact":
+            return <Contact type={layer.styleVariant} data={layerContent} />;
+          case "TextBox":
+            return <TextBoxType key={layer.componentType} data={layerContent} />;
+          default:
+            return null;
+        }
     } catch (err) {
       console.error(`Render error (${layer.componentType}):`, err);
       return null;
