@@ -12,6 +12,8 @@ import Header from "@components/Header";
 import CallToAction from "@components/CallToAction";
 import Contact from "@components/Contact";
 import MainContent from "@components/MainContent";
+import Footer from "@components/Footer";
+import Navbar from "@components/Navbar";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +35,7 @@ const PageViewer = () => {
   const { pageTitle } = useParams() as { pageTitle: string };
   const [sections, setSections] = useState<JSX.Element[]>([]);
   const [footer, setFooter] = useState<JSX.Element[]>([]);
+  const [navbar, setNavbar] = useState<JSX.Element[]>([]);
 
   const parsedPageTitle = pageTitle.replace(/-/g, " ");
 
@@ -63,8 +66,21 @@ const PageViewer = () => {
         const rendered = layers?.map(renderSection).filter(Boolean) || [];
         setSections(rendered);
 
-        const footerContent = viewerData.footerData;
-        setFooter(footerContent ? [<FooterType1 key="footer" data={footerContent} />] : []);
+        const webElementsData = viewerData.webElementsData;
+
+        console.log(webElementsData)
+
+
+        const navbarContent = webElementsData.navbarData;
+        const navbarType = webElementsData.navbarType;
+
+        setNavbar(navbarContent? [<Navbar type={navbarType} data={navbarContent} typeSubLink={0}/>] : []);
+
+        const footerContent = webElementsData.footerData;
+        const footerType = webElementsData.footerType;
+
+        console.log(footerContent.navigation)
+        setFooter(footerContent ? [<Footer type={footerType} data={footerContent} />] : []);
       } catch (err) {
         console.error("Error rendering viewer:", err);
       }
@@ -100,6 +116,7 @@ const PageViewer = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div data-testid="viewer-container" className="h-full w-full">
+        {navbar}
         {sections}
         {footer}
       </div>
