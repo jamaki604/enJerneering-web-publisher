@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import React from "react";
 
 export const dynamic = "force-dynamic";
 
