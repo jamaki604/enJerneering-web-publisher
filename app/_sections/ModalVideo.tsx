@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 
 import { useState, useRef, Fragment } from "react";
 import type { StaticImageData } from "next/image";

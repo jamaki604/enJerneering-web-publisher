@@ -2,6 +2,7 @@
 
 import React from "react";
 import { FeaturedData } from "../../types/NavbarData";
+
 import Image from "next/image";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 
